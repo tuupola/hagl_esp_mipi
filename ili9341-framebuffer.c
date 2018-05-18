@@ -36,14 +36,14 @@ static framebuffer_t fb = {
     .depth = 16,
 };
 
-spi_device_handle_t g_spi;
+static spi_device_handle_t spi;
 
 /*
  * Initializes the ILI9341 + framebuffer HAL.
  */
 void pod_hal_init(void)
 {
-    ili9341_init(&g_spi);
+    ili9341_init(&spi);
     framebuffer_init(&fb);
 }
 
@@ -52,7 +52,7 @@ void pod_hal_init(void)
  */
 void pod_hal_flush(void)
 {
-    ili9431_blit(g_spi, 0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, (uint16_t *) fb.buffer);
+    ili9431_blit(spi, 0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, (uint16_t *) fb.buffer);
 }
 
 /*
