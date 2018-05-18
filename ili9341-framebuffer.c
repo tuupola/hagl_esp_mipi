@@ -30,7 +30,7 @@ SOFTWARE.
 
 #include "ili9341-framebuffer.h"
 
-framebuffer_t g_fb = {
+static framebuffer_t fb = {
     .width = FRAMEBUFFER_WIDTH,
     .height = FRAMEBUFFER_HEIGHT,
     .depth = 16,
@@ -44,7 +44,7 @@ spi_device_handle_t g_spi;
 void pod_hal_init(void)
 {
     ili9341_init(&g_spi);
-    framebuffer_init(&g_fb);
+    framebuffer_init(&fb);
 }
 
 /*
@@ -52,7 +52,7 @@ void pod_hal_init(void)
  */
 void pod_hal_flush(void)
 {
-    ili9431_blit(g_spi, 0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, (uint16_t *) g_fb.buffer);
+    ili9431_blit(g_spi, 0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, (uint16_t *) fb.buffer);
 }
 
 /*
@@ -62,9 +62,9 @@ void pod_hal_flush(void)
  */
 void pod_hal_putpixel(uint16_t x0, uint16_t y0, uint16_t color)
 {
-    uint16_t *ptr = (uint16_t *) (g_fb.buffer + g_fb.pitch * y0 + (g_fb.depth / 8) * x0);
+    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
 
-    if((x0 < g_fb.width) && (y0 < g_fb.height)) {
+    if ((x0 < fb.width) && (y0 < fb.height)) {
     	*ptr = color;
     }
 }
@@ -74,7 +74,7 @@ void pod_hal_putpixel(uint16_t x0, uint16_t y0, uint16_t color)
  */
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
-    blit(x0, y0, src, &g_fb);
+    blit(x0, y0, src, &fb);
 }
 
 /*
@@ -83,7 +83,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
  */
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
-    scale_blit(x0, y0, w, h, src, &g_fb);
+    scale_blit(x0, y0, w, h, src, &fb);
 }
 
 /*
@@ -106,7 +106,7 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 // void pod_hal_vline(uint16_t x1, uint16_t y1, uint16_t height, uint16_t color)
 // {
 //     {
-//     uint16_t *ptr = g_fb.buffer + g_fb.pitch * y0 + (g_fb.depth / 8) * x0;
+//     uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
 
 
 //     for (uint16_t i = 0; i < height; i++) {
