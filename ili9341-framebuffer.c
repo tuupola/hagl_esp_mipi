@@ -110,15 +110,21 @@ void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing.
  */
-// void pod_hal_vline(uint16_t x1, uint16_t y1, uint16_t height, uint16_t color)
-// {
-//     {
-//     uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
+void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t height, uint16_t color)
+{
+    /* x0 or y0 is over the edge, nothing to do. */
+    if ((x0 > FRAMEBUFFER_WIDTH) || (y0 > FRAMEBUFFER_HEIGHT))  {
+        return;
+    }
 
+    /* Cut anything going over right edge. */
+    if (((y0 + height) > FRAMEBUFFER_HEIGHT))  {
+        height = height - (y0 + height - FRAMEBUFFER_WIDTH);
+    }
 
-//     for (uint16_t i = 0; i < height; i++) {
-//         ((uint16_t *)bitmap)[i] = color;
-//     }
-
-//     pod_hal_blit(x1, y1, &bitmap);
-// }
+    uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
+    for (uint16_t y = 0; y < height; y++) {
+        *ptr = color;
+        ptr += fb.pitch / (fb.depth / 8);
+    }
+}

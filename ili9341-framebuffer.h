@@ -34,7 +34,7 @@ SOFTWARE.
 #define POD_HAS_HAL_BLIT
 #define POD_HAS_HAL_SCALE_BLIT
 #define POD_HAS_HAL_HLINE
-//#define POD_HAS_HAL_VLINE
+#define POD_HAS_HAL_VLINE
 #define POD_HAS_HAL_INIT
 #define POD_HAS_HAL_FLUSH
 
@@ -43,7 +43,7 @@ void pod_hal_flush(void);
 void pod_hal_putpixel(uint16_t x0, uint16_t y0, uint16_t color);
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
-// void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t w, uint16_t color);
-// void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t h, uint16_t color);
+void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t w, uint16_t color);
+void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t h, uint16_t color);
 
 #endif /* _ILI9341_FRAMEBUFFER_H */
