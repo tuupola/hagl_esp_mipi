@@ -101,7 +101,7 @@ void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
         width = width - (x0 + width - fb.width);
     }
 
-    uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
+    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x < width; x++) {
         *ptr++ = color;
     }
@@ -122,7 +122,7 @@ void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t height, uint16_t color)
         height = height - (y0 + height - fb.height);
     }
 
-    uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
+    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
