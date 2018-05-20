@@ -52,7 +52,7 @@ void pod_hal_init(void)
  */
 void pod_hal_flush(void)
 {
-    ili9431_blit(spi, 0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT, (uint16_t *) fb.buffer);
+    ili9431_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
 }
 
 /*
@@ -92,13 +92,13 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
 {
     /* x0 or y0 is over the edge, nothing to do. */
-    if ((x0 > FRAMEBUFFER_WIDTH) || (y0 > FRAMEBUFFER_HEIGHT))  {
+    if ((x0 > fb.width) || (y0 > fb.height))  {
         return;
     }
 
     /* Cut anything going over right edge. */
-    if (((x0 + width) > FRAMEBUFFER_WIDTH))  {
-        width = width - (x0 + width - FRAMEBUFFER_WIDTH);
+    if (((x0 + width) > fb.width))  {
+        width = width - (x0 + width - fb.width);
     }
 
     uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
@@ -113,13 +113,13 @@ void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
 void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t height, uint16_t color)
 {
     /* x0 or y0 is over the edge, nothing to do. */
-    if ((x0 > FRAMEBUFFER_WIDTH) || (y0 > FRAMEBUFFER_HEIGHT))  {
+    if ((x0 > fb.width) || (y0 > fb.height))  {
         return;
     }
 
     /* Cut anything going over right edge. */
-    if (((y0 + height) > FRAMEBUFFER_HEIGHT))  {
-        height = height - (y0 + height - FRAMEBUFFER_WIDTH);
+    if (((y0 + height) > fb.height))  {
+        height = height - (y0 + height - fb.height);
     }
 
     uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
