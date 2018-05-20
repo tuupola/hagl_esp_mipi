@@ -89,16 +89,23 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 /*
  * Accelerated horizontal line drawing.
  */
-//void pod_hal_hline(uint16_t x1, uint16_t y1, uint16_t width, uint16_t color)
-// {
-//     uint16_t bitmap[width];
+void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
+{
+    /* x0 or y0 is over the edge, nothing to do. */
+    if ((x0 > FRAMEBUFFER_WIDTH) || (y0 > FRAMEBUFFER_HEIGHT))  {
+        return;
+    }
 
-//     for (uint16_t i = 0; i < width; i++) {
-//         ((uint16_t *)bitmap)[i] = color;
-//     }
+    /* Cut anything going over right edge. */
+    if (((x0 + width) > FRAMEBUFFER_WIDTH))  {
+        width = width - (x0 + width - FRAMEBUFFER_WIDTH);
+    }
 
-//     pod_hal_blit(x1, y1, &bitmap);
-// }
+    uint16_t *ptr = fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0;
+    for (uint16_t x = 0; x < width; x++) {
+        *ptr++ = color;
+    }
+}
 
 /*
  * Accelerated vertical line drawing.
