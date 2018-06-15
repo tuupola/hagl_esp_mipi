@@ -43,7 +43,7 @@ void pod_hal_flush(void);
 void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color);
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
-void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t w, uint16_t color);
-void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t h, uint16_t color);
+void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
+void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 
 #endif /* _ILI9341_FRAMEBUFFER_H */

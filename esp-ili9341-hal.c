@@ -112,10 +112,21 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 /*
  * Accelerated horizontal line drawing.
  */
-void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
+void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
     /* x0 or y0 is over the edge, nothing to do. */
     if ((x0 > fb.width) || (y0 > fb.height))  {
+        return;
+    }
+
+    /* x0 is negative, ignore parts outside of screen. */
+    if (x0 < 0) {
+        width = width + x0;
+        x0 = 0;
+    }
+
+    /* Everything outside viewport, nothing to do. */
+    if (width < 0)  {
         return;
     }
 
@@ -145,10 +156,21 @@ void pod_hal_hline(uint16_t x0, uint16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing.
  */
-void pod_hal_vline(uint16_t x0, uint16_t y0, uint16_t height, uint16_t color)
+void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
     /* x0 or y0 is over the edge, nothing to do. */
     if ((x0 > fb.width) || (y0 > fb.height))  {
+        return;
+    }
+
+    /* y0 is negative, ignore parts outside of screen. */
+    if (y0 < 0) {
+        height = height + y0;
+        y0 = 0;
+    }
+
+    /* Everything outside viewport, nothing to do. */
+    if (height < 0)  {
         return;
     }
 
