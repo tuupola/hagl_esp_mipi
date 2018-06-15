@@ -65,11 +65,17 @@ void pod_hal_flush(void)
  * must implement for copepod to be able to draw graphical primitives.
  * This version draws to a framebuffer.
  */
-void pod_hal_putpixel(uint16_t x0, uint16_t y0, uint16_t color)
+void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
 
+    /* x0 or y0 is before the edge, nothing to do. */
+    if ((x0 < 0) || (y0 < 0))  {
+        return;
+    }
+
+    /* If still in bounds set the pixel. */
     if ((x0 < fb.width) && (y0 < fb.height)) {
     	*ptr = color;
     }
