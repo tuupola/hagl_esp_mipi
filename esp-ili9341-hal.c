@@ -112,8 +112,10 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 /*
  * Accelerated horizontal line drawing.
  */
-void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
+void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color)
 {
+    int16_t width = w;
+
     /* x0 or y0 is over the edge, nothing to do. */
     if ((x0 > fb.width) || (y0 > fb.height))  {
         return;
@@ -156,8 +158,10 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing.
  */
-void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
+void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color)
 {
+    int16_t height = h;
+
     /* x0 or y0 is over the edge, nothing to do. */
     if ((x0 > fb.width) || (y0 > fb.height))  {
         return;
