@@ -28,6 +28,9 @@ SOFTWARE.
 #include <stdint.h>
 #include <bitmap.h>
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
 #define FRAMEBUFFER_WIDTH   320
 #define FRAMEBUFFER_HEIGHT  240
 
@@ -45,5 +48,15 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
+
+static inline uint32_t pod_hal_ticks()
+{
+    return xTaskGetTickCount();
+}
+
+static inline uint32_t pod_hal_ticks_per_second()
+{
+    return pdMS_TO_TICKS(1000);
+}
 
 #endif /* _ILI9341_FRAMEBUFFER_H */

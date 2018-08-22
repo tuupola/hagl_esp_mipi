@@ -28,7 +28,7 @@ SOFTWARE.
 #include <copepod.h>
 #include <framebuffer.h>
 
-#include "esp-ili9341-hal.h"
+#include "copepod-hal.h"
 #include "sdkconfig.h"
 
 static framebuffer_t fb = {

@@ -1,9 +1,5 @@
 menu "Copepod HAL"
 
-config POD_HAL_HEADER_FILE
-    string "HAL header file"
-    default "esp-ili9341-hal.h"
-
 config POD_HAL_USE_FRAMEBUFFER
     bool "Use virtual framebuffer"
     default y
