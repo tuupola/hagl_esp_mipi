@@ -22,6 +22,8 @@ SOFTWARE.
 
 */
 
+#include <esp_log.h>
+
 #include <string.h>
 #include <ili9341.h>
 #include <blit.h>
@@ -117,7 +119,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color)
     int16_t width = w;
 
     /* x0 or y0 is over the edge, nothing to do. */
-    if ((x0 > fb.width) || (y0 > fb.height))  {
+    if ((x0 > fb.width - 1) || (y0 > fb.height - 1) || (y0 < 0))  {
         return;
     }
 
@@ -133,7 +135,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color)
     }
 
     /* Cut anything going over right edge. */
-    if (((x0 + width) > fb.width))  {
+    if (((x0 + width) > fb.width)) {
         width = width - (x0 + width - fb.width);
     }
 
