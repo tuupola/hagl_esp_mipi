@@ -34,8 +34,8 @@ SOFTWARE.
 #include "sdkconfig.h"
 
 static framebuffer_t fb = {
-    .width = FRAMEBUFFER_WIDTH,
-    .height = FRAMEBUFFER_HEIGHT,
+    .width = DISPLAY_WIDTH,
+    .height = DISPLAY_HEIGHT,
     .depth = 16,
 };
 
@@ -72,15 +72,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
 
-    /* x0 or y0 is before the edge, nothing to do. */
-    if ((x0 < 0) || (y0 < 0))  {
-        return;
-    }
-
-    /* If still in bounds set the pixel. */
-    if ((x0 < fb.width) && (y0 < fb.height)) {
-    	*ptr = color;
-    }
+    *ptr = color;
 #else
     ili9431_putpixel(spi, x0, y0, color);
 #endif
@@ -114,31 +106,8 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 /*
  * Accelerated horizontal line drawing.
  */
-void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color)
+void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
-    int16_t width = w;
-
-    /* x0 or y0 is over the edge, nothing to do. */
-    if ((x0 > fb.width - 1) || (y0 > fb.height - 1) || (y0 < 0))  {
-        return;
-    }
-
-    /* x0 is negative, ignore parts outside of screen. */
-    if (x0 < 0) {
-        width = width + x0;
-        x0 = 0;
-    }
-
-    /* Everything outside viewport, nothing to do. */
-    if (width < 0)  {
-        return;
-    }
-
-    /* Cut anything going over right edge. */
-    if (((x0 + width) > fb.width)) {
-        width = width - (x0 + width - fb.width);
-    }
-
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x < width; x++) {
@@ -160,31 +129,8 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color)
 /*
  * Accelerated vertical line drawing.
  */
-void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color)
+void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
-    int16_t height = h;
-
-    /* x0 or y0 is over the edge, nothing to do. */
-    if ((x0 > fb.width) || (y0 > fb.height))  {
-        return;
-    }
-
-    /* y0 is negative, ignore parts outside of screen. */
-    if (y0 < 0) {
-        height = height + y0;
-        y0 = 0;
-    }
-
-    /* Everything outside viewport, nothing to do. */
-    if (height < 0)  {
-        return;
-    }
-
-    /* Cut anything going over right edge. */
-    if (((y0 + height) > fb.height))  {
-        height = height - (y0 + height - fb.height);
-    }
-
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y < height; y++) {
