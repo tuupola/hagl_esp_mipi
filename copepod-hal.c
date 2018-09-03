@@ -33,11 +33,13 @@ SOFTWARE.
 #include "copepod-hal.h"
 #include "sdkconfig.h"
 
+#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
 static framebuffer_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
     .depth = 16,
 };
+#endif
 
 static spi_device_handle_t spi;
 
@@ -71,7 +73,6 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-
     *ptr = color;
 #else
     ili9431_putpixel(spi, x0, y0, color);
