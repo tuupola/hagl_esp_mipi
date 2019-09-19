@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2018 Mika Tuupola
+Copyright (c) 2018 - 2019 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
+
+/* See: https://github.com/tuupola/copepod-esp-ili9341/ */
 
 #ifndef _ILI9341_FRAMEBUFFER_H
 #define _ILI9341_FRAMEBUFFER_H
