@@ -33,6 +33,7 @@ SOFTWARE.
 
 #define DISPLAY_WIDTH       (320)
 #define DISPLAY_HEIGHT      (240)
+#define DISPLAY_DEPTH       (16)
 
 #define POD_HAS_HAL_BLIT
 #define POD_HAS_HAL_SCALE_BLIT

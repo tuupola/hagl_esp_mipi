@@ -37,7 +37,7 @@ SOFTWARE.
 static framebuffer_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
-    .depth = 16,
+    .depth = DISPLAY_DEPTH,
 };
 #endif
 
@@ -50,7 +50,8 @@ void pod_hal_init(void)
 {
     ili9341_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    framebuffer_init(&fb);
+    static uint8_t buffer[FRAMEBUFFER_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
+    framebuffer_init(&fb, buffer);
 #endif
 }
 
@@ -115,7 +116,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
         *ptr++ = color;
     }
 #else
-    uint16_t line[width];
+    static uint16_t line[DISPLAY_WIDTH];
     uint16_t *ptr = line;
     uint16_t height = 1;
 
@@ -123,7 +124,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
         *(ptr++) = color;
     }
 
-    ili9431_blit(spi, x0, y0, width, height, &line);
+    ili9431_blit(spi, x0, y0, width, height, line);
 #endif
 }
 
@@ -139,7 +140,7 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
         ptr += fb.pitch / (fb.depth / 8);
     }
 #else
-    uint16_t line[height];
+    uint16_t line[DISPLAY_HEIGHT];
     uint16_t *ptr = line;
     uint16_t width = 1;
 
