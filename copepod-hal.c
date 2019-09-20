@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2018 - 2019 Mika Tuupola
+Copyright (c) 2019 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,12 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-ili9341/ */
+/* See: https://github.com/tuupola/copepod-esp-st7735s */
 
 #include <esp_log.h>
 
 #include <string.h>
-#include <ili9341.h>
+#include <st7735s.h>
 #include <bitmap.h>
 #include <copepod.h>
 
@@ -45,11 +45,11 @@ static bitmap_t fb = {
 static spi_device_handle_t spi;
 
 /*
- * Initializes the ILI9341 + framebuffer HAL.
+ * Initializes the ST7735S + framebuffer HAL.
  */
 void pod_hal_init(void)
 {
-    ili9341_init(&spi);
+    st7735s_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     static uint8_t buffer[BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
     bitmap_init(&fb, buffer);
@@ -62,7 +62,7 @@ void pod_hal_init(void)
 void pod_hal_flush(void)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    ili9431_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
+    st7735s_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
 #endif
 }
 
@@ -77,7 +77,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
 #else
-    ili9431_putpixel(spi, x0, y0, color);
+    st7735s_putpixel(spi, x0, y0, color);
 #endif
 }
 
@@ -89,7 +89,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     bitmap_blit(x0, y0, src, &fb);
 #else
-    ili9431_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
+    st7735s_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
 #endif
 }
 
@@ -125,7 +125,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
         *(ptr++) = color;
     }
 
-    ili9431_blit(spi, x0, y0, width, height, line);
+    st7735s_blit(spi, x0, y0, width, height, line);
 #endif
 }
 
@@ -149,6 +149,6 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
         *(ptr++) = color;
     }
 
-    ili9431_blit(spi, x0, y0, width, height, &line);
+    st7735s_blit(spi, x0, y0, width, height, &line);
 #endif
 }

@@ -22,10 +22,10 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-ili9341/ */
+/* See: https://github.com/tuupola/copepod-esp-st7735s/ */
 
-#ifndef _ILI9341_FRAMEBUFFER_H
-#define _ILI9341_FRAMEBUFFER_H
+#ifndef _COPEPOD_ST7735S_HAL_H
+#define _COPEPOD_ST7735S_HAL_H
 
 #include <stdint.h>
 #include <bitmap.h>
@@ -33,8 +33,8 @@ SOFTWARE.
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define DISPLAY_WIDTH       (CONFIG_ILI9341_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT      (CONFIG_ILI9341_DISPLAY_HEIGHT)
+#define DISPLAY_WIDTH       (CONFIG_ST7735S_DISPLAY_WIDTH)
+#define DISPLAY_HEIGHT      (CONFIG_ST7735S_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
 
 #define POD_HAS_HAL_BLIT
@@ -62,4 +62,4 @@ static inline uint32_t pod_hal_ticks_per_second()
     return pdMS_TO_TICKS(1000);
 }
 
-#endif /* _ILI9341_FRAMEBUFFER_H */
+#endif /* _COPEPOD_ST7735S_HAL_H */
