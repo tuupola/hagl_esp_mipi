@@ -33,8 +33,8 @@ SOFTWARE.
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define DISPLAY_WIDTH       (320)
-#define DISPLAY_HEIGHT      (240)
+#define DISPLAY_WIDTH       (CONFIG_ILI9341_DISPLAY_WIDTH)
+#define DISPLAY_HEIGHT      (CONFIG_ILI9341_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
 
 #define POD_HAS_HAL_BLIT

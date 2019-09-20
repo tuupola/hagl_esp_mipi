@@ -31,8 +31,8 @@ SOFTWARE.
 #include <bitmap.h>
 #include <copepod.h>
 
-#include "copepod-hal.h"
 #include "sdkconfig.h"
+#include "copepod-hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
 static bitmap_t fb = {
