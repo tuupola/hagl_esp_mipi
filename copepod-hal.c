@@ -30,13 +30,12 @@ SOFTWARE.
 #include <ili9341.h>
 #include <bitmap.h>
 #include <copepod.h>
-#include <framebuffer.h>
 
 #include "copepod-hal.h"
 #include "sdkconfig.h"
 
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-static framebuffer_t fb = {
+static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
     .depth = DISPLAY_DEPTH,
@@ -52,8 +51,8 @@ void pod_hal_init(void)
 {
     ili9341_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    static uint8_t buffer[FRAMEBUFFER_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
-    framebuffer_init(&fb, buffer);
+    static uint8_t buffer[BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
+    bitmap_init(&fb, buffer);
 #endif
 }
 
