@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <string.h>
 #include <ili9341.h>
-#include <blit.h>
+#include <bitmap.h>
 #include <copepod.h>
 #include <framebuffer.h>
 
@@ -88,7 +88,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    blit(x0, y0, src, &fb);
+    bitmap_blit(x0, y0, src, &fb);
 #else
     ili9431_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
 #endif
@@ -101,7 +101,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    scale_blit(x0, y0, w, h, src, &fb);
+    bitmap_scale_blit(x0, y0, w, h, src, &fb);
 #else
     /* TODO */
 #endif
@@ -114,7 +114,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t x = 0; x < width; x++) {
+    for (uint16_t x = 0; x <= width; x++) {
         *ptr++ = color;
     }
 #else
@@ -122,7 +122,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
     uint16_t *ptr = line;
     uint16_t height = 1;
 
-    for (uint16_t x = 0; x < width; x++) {
+    for (uint16_t x = 0; x <= width; x++) {
         *(ptr++) = color;
     }
 
@@ -137,7 +137,7 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t y = 0; y < height; y++) {
+    for (uint16_t y = 0; y <= height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
     }
@@ -146,7 +146,7 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
     uint16_t *ptr = line;
     uint16_t width = 1;
 
-    for (uint16_t x = 0; x < width; x++) {
+    for (uint16_t x = 0; x <= width; x++) {
         *(ptr++) = color;
     }
 
