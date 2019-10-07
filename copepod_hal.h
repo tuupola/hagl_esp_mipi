@@ -22,10 +22,10 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-mipi/ */
+/* See: https://github.com/tuupola/copepod_esp_mipi/ */
 
-#ifndef _COPEPOD_ESP_MIPI_HAL_H
-#define _COPEPOD_ESP_MIPI_HAL_H
+#ifndef _COPEPOD_HAL_H
+#define _COPEPOD_HAL_H
 
 #include <stdint.h>
 #include <bitmap.h>
@@ -52,4 +52,4 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 
-#endif /* _COPEPOD_ESP_MIPI_HAL_H */
+#endif /* _COPEPOD_HAL_H */

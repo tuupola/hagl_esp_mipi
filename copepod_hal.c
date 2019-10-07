@@ -22,7 +22,7 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-mipi */
+/* See: https://github.com/tuupola/copepod_esp_mipi/ */
 
 #include <esp_log.h>
 
@@ -32,7 +32,7 @@ SOFTWARE.
 #include <copepod.h>
 
 #include "sdkconfig.h"
-#include "copepod-hal.h"
+#include "copepod_hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
 static bitmap_t fb = {
