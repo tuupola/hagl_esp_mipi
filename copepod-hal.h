@@ -22,10 +22,10 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-st7735s/ */
+/* See: https://github.com/tuupola/copepod-esp-mipi/ */
 
-#ifndef _COPEPOD_ST7735S_HAL_H
-#define _COPEPOD_ST7735S_HAL_H
+#ifndef _COPEPOD_ESP_MIPI_HAL_H
+#define _COPEPOD_ESP_MIPI_HAL_H
 
 #include <stdint.h>
 #include <bitmap.h>
@@ -33,8 +33,8 @@ SOFTWARE.
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#define DISPLAY_WIDTH       (CONFIG_ST7735S_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT      (CONFIG_ST7735S_DISPLAY_HEIGHT)
+#define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
+#define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
 
 #define POD_HAS_HAL_BLIT
@@ -52,14 +52,4 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 
-static inline uint32_t pod_hal_ticks()
-{
-    return xTaskGetTickCount();
-}
-
-static inline uint32_t pod_hal_ticks_per_second()
-{
-    return pdMS_TO_TICKS(1000);
-}
-
-#endif /* _COPEPOD_ST7735S_HAL_H */
+#endif /* _COPEPOD_ESP_MIPI_HAL_H */

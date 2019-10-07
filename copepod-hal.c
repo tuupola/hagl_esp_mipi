@@ -22,12 +22,12 @@ SOFTWARE.
 
 */
 
-/* See: https://github.com/tuupola/copepod-esp-st7735s */
+/* See: https://github.com/tuupola/copepod-esp-mipi */
 
 #include <esp_log.h>
 
 #include <string.h>
-#include <st7735s.h>
+#include <mipi_display.h>
 #include <bitmap.h>
 #include <copepod.h>
 
@@ -45,11 +45,11 @@ static bitmap_t fb = {
 static spi_device_handle_t spi;
 
 /*
- * Initializes the ST7735S + framebuffer HAL.
+ * Initializes the MIPI display + framebuffer HAL.
  */
 void pod_hal_init(void)
 {
-    st7735s_init(&spi);
+    mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     static uint8_t buffer[BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
     bitmap_init(&fb, buffer);
@@ -62,7 +62,7 @@ void pod_hal_init(void)
 void pod_hal_flush(void)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    st7735s_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
+    mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
 #endif
 }
 
@@ -77,7 +77,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
 #else
-    st7735s_putpixel(spi, x0, y0, color);
+    mipi_display_put_pixel(spi, x0, y0, color);
 #endif
 }
 
@@ -89,7 +89,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
     bitmap_blit(x0, y0, src, &fb);
 #else
-    st7735s_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
+    mipi_display_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
 #endif
 }
 
@@ -125,7 +125,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
         *(ptr++) = color;
     }
 
-    st7735s_blit(spi, x0, y0, width, height, line);
+    mipi_display_blit(spi, x0, y0, width, height, line);
 #endif
 }
 
@@ -149,6 +149,6 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
         *(ptr++) = color;
     }
 
-    st7735s_blit(spi, x0, y0, width, height, &line);
+    mipi_display_blit(spi, x0, y0, width, height, &line);
 #endif
 }

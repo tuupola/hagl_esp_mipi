@@ -1,4 +1,4 @@
-menu "Copepod HAL"
+menu "Copepod HAL (MIPI)"
 
 config POD_HAL_USE_FRAMEBUFFER
     bool "Use virtual framebuffer"
