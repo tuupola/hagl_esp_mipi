@@ -129,7 +129,8 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
         *(ptr++) = color;
     }
 
-    mipi_display_blit(spi, x0, y0, width, height, line);
+    /* TODO: width has off by one error somewhere */
+    mipi_display_blit(spi, x0, y0, width + 1, height, line);
 #endif
 }
 
