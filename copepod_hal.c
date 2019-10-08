@@ -25,7 +25,7 @@ SOFTWARE.
 /* See: https://github.com/tuupola/copepod_esp_mipi/ */
 
 #include <esp_log.h>
-
+#include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
 #include <bitmap.h>
@@ -35,6 +35,7 @@ SOFTWARE.
 #include "copepod_hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+static uint8_t *buffer;
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
@@ -51,7 +52,10 @@ void pod_hal_init(void)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    static uint8_t buffer[BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH)];
+    buffer = (uint8_t *) heap_caps_malloc(
+        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+    );
     bitmap_init(&fb, buffer);
 #endif
 }
