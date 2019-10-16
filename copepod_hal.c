@@ -46,7 +46,7 @@ static bitmap_t fb = {
 static spi_device_handle_t spi;
 
 /*
- * Initializes the MIPI display + framebuffer HAL.
+ * Initializes the MIPI display and an optional framebuffer
  */
 void pod_hal_init(void)
 {
@@ -61,7 +61,7 @@ void pod_hal_init(void)
 }
 
 /*
- * Flushes the framebuffer contents to the actual display.
+ * Flushes the optional framebuffer contents to the display
  */
 void pod_hal_flush(void)
 {
@@ -71,9 +71,10 @@ void pod_hal_flush(void)
 }
 
 /*
- * Putpixel function. This is the only mandatory function which HAL
- * must implement for copepod to be able to draw graphical primitives.
- * This version draws to a framebuffer.
+ * Put a pixel to the display
+ *
+ * This is the only mandatory function which HAL must implement for copepod
+ * to be able to draw graphical primitives.
  */
 void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 {
@@ -86,7 +87,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 }
 
 /*
- * Blit the source bitmap to the framebuffer.
+ * Blit the source bitmap the display
  */
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
@@ -98,8 +99,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 }
 
 /*
- * Blit the source bitmap to the framebuffer scaled up or down.
- * TODO: stretch might be more proper naming?
+ * Blit the source bitmap to the display scaled up or down
  */
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
@@ -111,7 +111,7 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 }
 
 /*
- * Accelerated horizontal line drawing.
+ * Accelerated horizontal line drawing
  */
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
@@ -135,7 +135,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 }
 
 /*
- * Accelerated vertical line drawing.
+ * Accelerated vertical line drawing
  */
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
