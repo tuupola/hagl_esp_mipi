@@ -24,6 +24,8 @@ SOFTWARE.
 
 /* See: https://github.com/tuupola/copepod_esp_mipi/ */
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <esp_log.h>
 #include <esp_heap_caps.h>
 #include <string.h>
@@ -35,6 +37,7 @@ SOFTWARE.
 #include "copepod_hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+static SemaphoreHandle_t mutex;
 static uint8_t *buffer;
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
@@ -52,6 +55,8 @@ void pod_hal_init(void)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    mutex = xSemaphoreCreateMutex();
+
     buffer = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
@@ -69,7 +74,9 @@ void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
     if (dirty) {
         uint16_t height = y1 - y0 + 1;
         uint8_t *ptr = (uint8_t *) (buffer + fb.pitch * y0 + (fb.depth / 8));
+        xSemaphoreTake(mutex, portMAX_DELAY);
         mipi_display_blit(spi, 0, y0, fb.width, height, ptr);
+        xSemaphoreGive(mutex);
     }
 
     // mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
@@ -85,8 +92,10 @@ void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
+    xSemaphoreGive(mutex);
 #else
     mipi_display_put_pixel(spi, x0, y0, color);
 #endif
@@ -98,7 +107,9 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    xSemaphoreTake(mutex, portMAX_DELAY);
     bitmap_blit(x0, y0, src, &fb);
+    xSemaphoreGive(mutex);
 #else
     mipi_display_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
 #endif
@@ -110,7 +121,9 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    xSemaphoreTake(mutex, portMAX_DELAY);
     bitmap_scale_blit(x0, y0, w, h, src, &fb);
+    xSemaphoreGive(mutex);
 #else
     /* TODO */
 #endif
@@ -122,10 +135,12 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x <= width; x++) {
         *ptr++ = color;
     }
+    xSemaphoreGive(mutex);
 #else
     static uint16_t line[DISPLAY_WIDTH];
     uint16_t *ptr = line;
@@ -146,11 +161,13 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+    xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y <= height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
     }
+    xSemaphoreGive(mutex);
 #else
     uint16_t line[DISPLAY_HEIGHT];
     uint16_t *ptr = line;
