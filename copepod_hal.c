@@ -63,10 +63,16 @@ void pod_hal_init(void)
 /*
  * Flushes the optional framebuffer contents to the display
  */
-void pod_hal_flush(void)
+void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
 #ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
-    mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
+    if (dirty) {
+        uint16_t height = y1 - y0 + 1;
+        uint8_t *ptr = (uint8_t *) (buffer + fb.pitch * y0 + (fb.depth / 8));
+        mipi_display_blit(spi, 0, y0, fb.width, height, ptr);
+    }
+
+    // mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint16_t *) fb.buffer);
 #endif
 }
 
