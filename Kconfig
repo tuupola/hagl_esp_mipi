@@ -4,4 +4,14 @@ config POD_HAL_USE_FRAMEBUFFER
     bool "Use virtual framebuffer"
     default y
 
+config POD_HAL_FLUSH_ONLY_DIRTY
+    bool "Flush only dirty part of framebuffer"
+    default y
+    depends on POD_HAL_USE_FRAMEBUFFER
+
+config POD_HAL_LOCK_WHEN_FLUSHING
+    bool "Lock framebuffer when flushing"
+    default y
+    depends on POD_HAL_USE_FRAMEBUFFER
+
 endmenu
