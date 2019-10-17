@@ -36,7 +36,7 @@ SOFTWARE.
 #include "sdkconfig.h"
 #include "copepod_hal.h"
 
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
 static SemaphoreHandle_t mutex;
 static uint8_t *buffer;
 static bitmap_t fb = {
@@ -54,7 +54,7 @@ static spi_device_handle_t spi;
 void pod_hal_init(void)
 {
     mipi_display_init(&spi);
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     mutex = xSemaphoreCreateMutex();
 
     buffer = (uint8_t *) heap_caps_malloc(
@@ -70,7 +70,7 @@ void pod_hal_init(void)
  */
 void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
 #ifdef CONFIG_POD_HAL_FLUSH_ONLY_DIRTY
     if (dirty) {
         uint16_t height = y1 - y0 + 1;
@@ -107,7 +107,7 @@ void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
  */
 void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
@@ -122,7 +122,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
  */
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     bitmap_blit(x0, y0, src, &fb);
     xSemaphoreGive(mutex);
@@ -136,7 +136,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
  */
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     bitmap_scale_blit(x0, y0, w, h, src, &fb);
     xSemaphoreGive(mutex);
@@ -150,7 +150,7 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
  */
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x <= width; x++) {
@@ -176,7 +176,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
  */
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
-#ifdef CONFIG_POD_HAL_USE_FRAMEBUFFER
+#ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y <= height; y++) {
