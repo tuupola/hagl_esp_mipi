@@ -78,22 +78,22 @@ void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 #ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
         /* Flush only dirty part of back buffer with locking. */
         xSemaphoreTake(mutex, portMAX_DELAY);
-        mipi_display_blit(spi, 0, y0, fb.width, height, ptr);
+        mipi_display_write(spi, 0, y0, fb.width, height, ptr);
         xSemaphoreGive(mutex);
 #else
         /* Flush only dirty part of back buffer. */
-        mipi_display_blit(spi, 0, y0, fb.width, height, ptr);
+        mipi_display_write(spi, 0, y0, fb.width, height, ptr);
 #endif
     }
 #else
 #ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     /* Flush the whole back buffer with locking. */
     xSemaphoreTake(mutex, portMAX_DELAY);
-    mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
     xSemaphoreGive(mutex);
 #else
     /* Flush the whole back buffer. */
-    mipi_display_blit(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
 #endif
 #endif
 #endif
@@ -113,7 +113,7 @@ void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
     *ptr = color;
     xSemaphoreGive(mutex);
 #else
-    mipi_display_put_pixel(spi, x0, y0, color);
+    mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 #endif
 }
 
@@ -127,7 +127,7 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
     bitmap_blit(x0, y0, src, &fb);
     xSemaphoreGive(mutex);
 #else
-    mipi_display_blit(spi, x0, y0, src->width, src->height, (uint16_t *) src->buffer);
+    mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
 #endif
 }
 
@@ -167,7 +167,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
     }
 
     /* TODO: width has off by one error somewhere */
-    mipi_display_blit(spi, x0, y0, width + 1, height, line);
+    mipi_display_write(spi, x0, y0, width + 1, height, (uint8_t *) line);
 #endif
 }
 
@@ -193,6 +193,6 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
         *(ptr++) = color;
     }
 
-    mipi_display_blit(spi, x0, y0, width, height, &line);
+    mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 #endif
 }
