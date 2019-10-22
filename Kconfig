@@ -1,7 +1,17 @@
 menu "Copepod HAL (MIPI)"
 
-config POD_HAL_USE_FRAMEBUFFER
-    bool "Use virtual framebuffer"
+config POD_HAL_USE_DOUBLE_BUFFERING
+    bool "Use double buffering"
     default y
+
+config POD_HAL_FLUSH_ONLY_DIRTY
+    bool "Flush only dirty part of back buffer"
+    default y
+    depends on POD_HAL_USE_DOUBLE_BUFFERING
+
+config POD_HAL_LOCK_WHEN_FLUSHING
+    bool "Lock back buffer when flushing"
+    default y
+    depends on POD_HAL_USE_DOUBLE_BUFFERING
 
 endmenu
