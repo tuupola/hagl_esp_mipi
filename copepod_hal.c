@@ -153,7 +153,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t x = 0; x <= width; x++) {
+    for (uint16_t x = 0; x < width; x++) {
         *ptr++ = color;
     }
     xSemaphoreGive(mutex);
@@ -162,12 +162,11 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
     uint16_t *ptr = line;
     uint16_t height = 1;
 
-    for (uint16_t x = 0; x <= width; x++) {
+    for (uint16_t x = 0; x < width; x++) {
         *(ptr++) = color;
     }
 
-    /* TODO: width has off by one error somewhere */
-    mipi_display_write(spi, x0, y0, width + 1, height, (uint8_t *) line);
+    mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 #endif
 }
 
@@ -179,7 +178,7 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t y = 0; y <= height; y++) {
+    for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
     }
@@ -189,7 +188,7 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
     uint16_t *ptr = line;
     uint16_t width = 1;
 
-    for (uint16_t x = 0; x <= width; x++) {
+    for (uint16_t x = 0; x < height; x++) {
         *(ptr++) = color;
     }
 
