@@ -1,6 +1,8 @@
 /*
 
-Copyright (c) 2019 Mika Tuupola
+MIT License
+
+Copyright (c) 2019-2020 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,9 +22,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-*/
+-cut-
 
-/* See: https://github.com/tuupola/copepod_esp_mipi/ */
+This file is part of the MIPI DCS HAL for Copepod graphics library:
+https://github.com/tuupola/copepod_esp_mipi/
+
+SPDX-License-Identifier: MIT
+
+*/
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
