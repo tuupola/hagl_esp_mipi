@@ -6,7 +6,7 @@ config POD_HAL_USE_DOUBLE_BUFFERING
 
 config POD_HAL_LOCK_WHEN_FLUSHING
     bool "Lock back buffer when flushing"
-    default y
+    default n
     depends on POD_HAL_USE_DOUBLE_BUFFERING
 
 endmenu
