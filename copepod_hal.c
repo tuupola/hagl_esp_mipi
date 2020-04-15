@@ -96,7 +96,7 @@ void pod_hal_flush()
  * This is the only mandatory function which HAL must implement for copepod
  * to be able to draw graphical primitives.
  */
-void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color)
+void pod_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
     xSemaphoreTake(mutex, portMAX_DELAY);
