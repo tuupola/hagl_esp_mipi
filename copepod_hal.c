@@ -68,24 +68,9 @@ void pod_hal_init(void)
 /*
  * Flushes the optional framebuffer contents to the display
  */
-void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
+void pod_hal_flush()
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
-#ifdef CONFIG_POD_HAL_FLUSH_ONLY_DIRTY
-    if (dirty) {
-        uint16_t height = y1 - y0 + 1;
-        uint8_t *ptr = (uint8_t *) (buffer + fb.pitch * y0 + (fb.depth / 8));
-#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
-        /* Flush only dirty part of back buffer with locking. */
-        xSemaphoreTake(mutex, portMAX_DELAY);
-        mipi_display_write(spi, 0, y0, fb.width, height, ptr);
-        xSemaphoreGive(mutex);
-#else
-        /* Flush only dirty part of back buffer. */
-        mipi_display_write(spi, 0, y0, fb.width, height, ptr);
-#endif
-    }
-#else
 #ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     /* Flush the whole back buffer with locking. */
     xSemaphoreTake(mutex, portMAX_DELAY);
@@ -94,7 +79,6 @@ void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1)
 #else
     /* Flush the whole back buffer. */
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-#endif
 #endif
 #endif
 }

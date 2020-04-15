@@ -45,7 +45,7 @@ SOFTWARE.
 #define POD_HAS_HAL_FLUSH
 
 void pod_hal_init(void);
-void pod_hal_flush(bool dirty, int16_t x0, int16_t y0, int16_t x1, int16_t y1);
+void pod_hal_flush();
 void pod_hal_putpixel(int16_t x0, int16_t y0, uint16_t color);
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
