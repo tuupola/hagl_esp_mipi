@@ -55,7 +55,7 @@ extern "C" {
 #define POD_HAS_HAL_INIT
 #define POD_HAS_HAL_FLUSH
 
-void pod_hal_init(void);
+bitmap_t *pod_hal_init(void);
 void pod_hal_flush();
 void pod_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);

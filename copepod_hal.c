@@ -58,7 +58,7 @@ static spi_device_handle_t spi;
 /*
  * Initializes the MIPI display and an optional framebuffer
  */
-void pod_hal_init(void)
+bitmap_t *pod_hal_init(void)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
@@ -69,6 +69,10 @@ void pod_hal_init(void)
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
     bitmap_init(&fb, buffer);
+
+    return &fb;
+#else
+    return NULL;
 #endif
 }
 
