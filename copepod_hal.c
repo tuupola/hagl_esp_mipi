@@ -44,14 +44,16 @@ SPDX-License-Identifier: MIT
 #include "copepod_hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
 static SemaphoreHandle_t mutex;
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 static uint8_t *buffer;
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
     .depth = DISPLAY_DEPTH,
 };
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 
 static spi_device_handle_t spi;
 
@@ -62,7 +64,9 @@ bitmap_t *pod_hal_init(void)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     mutex = xSemaphoreCreateMutex();
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 
     buffer = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
@@ -90,7 +94,7 @@ void pod_hal_flush()
 #else
     /* Flush the whole back buffer. */
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-#endif
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
