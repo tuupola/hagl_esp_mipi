@@ -44,14 +44,16 @@ SPDX-License-Identifier: MIT
 #include "copepod_hal.h"
 
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
 static SemaphoreHandle_t mutex;
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 static uint8_t *buffer;
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
     .height = DISPLAY_HEIGHT,
     .depth = DISPLAY_DEPTH,
 };
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 
 static spi_device_handle_t spi;
 
@@ -62,7 +64,9 @@ bitmap_t *pod_hal_init(void)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     mutex = xSemaphoreCreateMutex();
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 
     buffer = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
@@ -73,7 +77,7 @@ bitmap_t *pod_hal_init(void)
     return &fb;
 #else
     return NULL;
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -90,8 +94,8 @@ void pod_hal_flush()
 #else
     /* Flush the whole back buffer. */
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-#endif
-#endif
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -103,13 +107,17 @@ void pod_hal_flush()
 void pod_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #else
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -118,12 +126,16 @@ void pod_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
 void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
     bitmap_blit(x0, y0, src, &fb);
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #else
     mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -132,12 +144,16 @@ void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
     bitmap_scale_blit(x0, y0, w, h, src, &fb);
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #else
     /* TODO */
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -146,12 +162,16 @@ void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap
 void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x < width; x++) {
         *ptr++ = color;
     }
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #else
     static uint16_t line[DISPLAY_WIDTH];
     uint16_t *ptr = line;
@@ -162,7 +182,7 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
     }
 
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
 
 /*
@@ -171,13 +191,17 @@ void pod_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
 {
 #ifdef CONFIG_POD_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
     }
+#ifdef CONFIG_POD_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
+#endif /* CONFIG_POD_HAL_LOCK_WHEN_FLUSHING */
 #else
     uint16_t line[DISPLAY_HEIGHT];
     uint16_t *ptr = line;
@@ -188,5 +212,5 @@ void pod_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
     }
 
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
-#endif
+#endif /* CONFIG_POD_HAL_USE_DOUBLE_BUFFERING */
 }
