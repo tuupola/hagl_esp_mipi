@@ -24,15 +24,15 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the MIPI DCS HAL for Copepod graphics library:
-https://github.com/tuupola/copepod_esp_mipi/
+This file is part of the MIPI DCS HAL for HAGL graphics library:
+https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
 */
 
-#ifndef _COPEPOD_HAL_H
-#define _COPEPOD_HAL_H
+#ifndef _HAGL_HAL_H
+#define _HAGL_HAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,22 +48,22 @@ extern "C" {
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
 
-#define POD_HAS_HAL_BLIT
-#define POD_HAS_HAL_SCALE_BLIT
-#define POD_HAS_HAL_HLINE
-#define POD_HAS_HAL_VLINE
-#define POD_HAS_HAL_INIT
-#define POD_HAS_HAL_FLUSH
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_SCALE_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_FLUSH
 
-bitmap_t *pod_hal_init(void);
-void pod_hal_flush();
-void pod_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
-void pod_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
-void pod_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
-void pod_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
-void pod_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_flush();
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
+void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _COPEPOD_HAL_H */
+#endif /* _HAGL_HAL_H */
