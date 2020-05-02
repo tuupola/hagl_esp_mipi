@@ -1,12 +1,12 @@
-menu "Copepod HAL (MIPI)"
+menu "HAGL HAL (MIPI)"
 
-config POD_HAL_USE_DOUBLE_BUFFERING
+config HAGL_HAL_USE_DOUBLE_BUFFERING
     bool "Use double buffering"
     default y
 
-config POD_HAL_LOCK_WHEN_FLUSHING
+config HAGL_HAL_LOCK_WHEN_FLUSHING
     bool "Lock back buffer when flushing"
     default n
-    depends on POD_HAL_USE_DOUBLE_BUFFERING
+    depends on HAGL_HAL_USE_DOUBLE_BUFFERING
 
 endmenu
