@@ -38,6 +38,8 @@ SPDX-License-Identifier: MIT
 extern "C" {
 #endif
 
+#include "sdkconfig.h"
+
 #include <stdint.h>
 #include <bitmap.h>
 
@@ -54,6 +56,24 @@ extern "C" {
 #define HAGL_HAS_HAL_VLINE
 #define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_FLUSH
+
+/* No buffering is the default. */
+#undef HAGL_HAL_USE_BUFFERING
+
+#if defined CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
+#define HAGL_HAL_USE_BUFFERING
+#define HAGL_HAL_USE_TRIPLE_BUFFERING
+#undef HAGL_HAL_USE_DOUBLE_BUFFERING
+#endif /* CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */
+
+#if defined CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#define HAGL_HAL_USE_BUFFERING
+#undef HAGL_HAL_USE_TRIPLE_BUFFERING
+#define HAGL_HAL_USE_DOUBLE_BUFFERING
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+#define HAGL_HAL_LOCK_WHEN_FLUSHING;
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 
 bitmap_t *hagl_hal_init(void);
 void hagl_hal_flush();
