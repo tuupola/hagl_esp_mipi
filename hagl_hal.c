@@ -49,7 +49,9 @@ SPDX-License-Identifier: MIT
 static SemaphoreHandle_t mutex;
 #endif /* HAGL_HAL_LOCK_WHEN_FLUSHING */
 static uint8_t *buffer1;
+#ifdef HAGL_HAL_USE_TRIPLE_BUFFERING
 static uint8_t *buffer2;
+#endif /* HAGL_HAL_USE_TRIPLE_BUFFERING */
 
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
@@ -80,7 +82,7 @@ bitmap_t *hagl_hal_init(void)
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
     if (NULL == buffer1) {
-        ESP_LOGE(TAG, "NO BUFFER 1");
+        ESP_LOGE(TAG, "Failed to alloc buffer 1.");
     } else {
         ESP_LOGI(TAG, "Buffer 1 at: %p", buffer1);
     };
@@ -91,7 +93,7 @@ bitmap_t *hagl_hal_init(void)
     );
 
     if (NULL == buffer2) {
-        ESP_LOGI(TAG, "NO BUFFER 2");
+        ESP_LOGE(TAG, "Failed to alloc buffer 2.");
     } else {
         ESP_LOGI(TAG, "Buffer 2 at: %p", buffer2);
     };
@@ -158,10 +160,7 @@ void hagl_hal_flush()
     } else {
         fb.buffer = buffer1;
     }
-    // ESP_LOGI(TAG, "Buffer is now %p", fb.buffer);
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
-    // ESP_LOGI(TAG, "Flushing %p", buffer);
-
 }
 #endif /* HAGL_HAL_USE_TRIPLE_BUFFERING */
 
