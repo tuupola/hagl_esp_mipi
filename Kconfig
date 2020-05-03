@@ -1,17 +1,19 @@
-menu "HAGL HAL (MIPI)"
+menu "Hardware Agnostic Graphics Library HAL (MIPI)"
 
-config HAGL_HAL_USE_DOUBLE_BUFFERING
-    bool "Use double buffering"
-    default n if HAGL_HAL_USE_TRIPLE_BUFFERING
-    default y if !HAGL_HAL_USE_TRIPLE_BUFFERING
+choice
+    prompt "Buffering"
+    default HAGL_HAL_NO_BUFFERING
+    config HAGL_HAL_NO_BUFFERING
+        bool "disabled"
+    config HAGL_HAL_USE_DOUBLE_BUFFERING
+        bool "double"
+    config HAGL_HAL_USE_TRIPLE_BUFFERING
+        bool "triple"
+endchoice
 
 config HAGL_HAL_LOCK_WHEN_FLUSHING
     bool "Lock back buffer when flushing"
     default n
     depends on HAGL_HAL_USE_DOUBLE_BUFFERING
-
-config HAGL_HAL_USE_TRIPLE_BUFFERING
-    bool "Use triple buffering"
-    default n
 
 endmenu
