@@ -32,8 +32,9 @@ SPDX-License-Identifier: MIT
 */
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
-#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
+#ifdef HAGL_HAL_NO_BUFFERING
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -44,7 +45,6 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#include "hagl_hal.h"
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
@@ -103,4 +103,4 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 }
 
-#endif /* CONFIG_HAGL_HAL_NO_BUFFERING */
+#endif /* HAGL_HAL_NO_BUFFERING */

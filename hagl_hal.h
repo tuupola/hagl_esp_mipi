@@ -49,9 +49,27 @@ extern "C" {
 #define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
+#define DISPLAY_PITCH       (DISPLAY_WIDTH * (DISPLAY_DEPTH / 8))
+#define DISPLAY_BYTES       (DISPLAY_PITCH * DISPLAY_HEIGHT)
 
 /* This is the only mandatory function HAL must provide. */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
+
+
+#ifdef CONFIG_HAGL_HAL_BUFFER_SPLIT
+#define HAGL_HAL_BUFFER_SPLIT   (CONFIG_HAGL_HAL_BUFFER_SPLIT)
+
+#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#define CONFIG_HAGL_HAL_USE_SPLIT_DOUBLE_BUFFERING
+#undef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#endif
+
+#ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
+#define CONFIG_HAGL_HAL_USE_SPLIT_TRIPLE_BUFFERING
+#undef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
+#endif
+
+#endif /* CONFIG_HAGL_HAL_BUFFER_SPLIT */
 
 /* No buffering is the default. */
 #ifdef CONFIG_HAGL_HAL_NO_BUFFERING
@@ -68,6 +86,7 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 
 #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
 #define HAGL_HAL_USE_BUFFERING
+#define HAGL_HAL_USE_TRIPLE_BUFFERING
 
 #define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_BLIT
@@ -86,6 +105,7 @@ void hagl_hal_flush();
 
 #ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
 #define HAGL_HAL_USE_BUFFERING
+#define HAGL_HAL_USE_DOUBLE_BUFFERING
 
 #define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_BLIT
@@ -101,6 +121,20 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
 void hagl_hal_flush();
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
+
+#ifdef CONFIG_HAGL_HAL_USE_SPLIT_DOUBLE_BUFFERING
+#define HAGL_HAL_USE_BUFFERING
+#define HAGL_HAL_USE_SPLIT_DOUBLE_BUFFERING
+
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_FLUSH
+#define HAGL_HAS_HAL_CLEAR_SCREEN
+
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_flush();
+void hagl_hal_clear_screen();
+#endif /* CONFIG_HAGL_HAL_USE_SPLIT_DOUBLE_BUFFERING */
+
 
 #ifdef __cplusplus
 }

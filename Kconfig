@@ -11,6 +11,27 @@ choice
         bool "triple"
 endchoice
 
+config HAGL_HAL_USE_BUFFERING
+    bool
+    default y if !HAGL_HAL_NO_BUFFERING
+
+choice
+    prompt "Buffer splitting"
+    depends on HAGL_HAL_USE_BUFFERING
+    default HAGL_HAL_NO_BUFFER_SPLIT_SELECTED
+    config HAGL_HAL_NO_BUFFER_SPLIT_SELECTED
+        bool "disabled"
+    config HAGL_HAL_BUFFER_SPLIT_128_SELECTED
+        bool "Split at 128 lines (0x80)"
+    config HAGL_HAL_BUFFER_SPLIT_256_SELECTeD
+        bool "Split at 256 lines (0x100)"
+endchoice
+
+config HAGL_HAL_BUFFER_SPLIT
+    hex
+    default 0x80 if HAGL_HAL_BUFFER_SPLIT_128_SELECTED
+    default 0x100 if HAGL_HAL_BUFFER_SPLIT_256_SELECTED
+
 config HAGL_HAL_LOCK_WHEN_FLUSHING
     bool "Lock back buffer when flushing"
     default n

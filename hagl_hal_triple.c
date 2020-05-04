@@ -32,8 +32,9 @@ SPDX-License-Identifier: MIT
 */
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
-#ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
+#ifdef HAGL_HAL_USE_TRIPLE_BUFFERING
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -44,7 +45,6 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#include "hagl_hal.h"
 
 static uint8_t *buffer1;
 static uint8_t *buffer2;
@@ -179,4 +179,4 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
     }
 }
 
-#endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */
+#endif /* #ifdef HAGL_HAL_USE_TRIPLE_BUFFERING */
