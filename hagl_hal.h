@@ -48,7 +48,14 @@ extern "C" {
 
 #define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
+
+#ifdef  MIPI_DCS_PIXEL_FORMAT_8BIT_SELECTED
+#define DISPLAY_DEPTH       (8)
+typedef uint8_t color_t;
+#else
 #define DISPLAY_DEPTH       (16)
+typedef uint16_t color_t;
+#endif
 
 /* This is the only mandatory function HAL must provide. */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
