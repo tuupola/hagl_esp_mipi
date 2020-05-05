@@ -31,6 +31,9 @@ SPDX-License-Identifier: MIT
 
 */
 
+#include "sdkconfig.h"
+#include "hagl_hal.h"
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <esp_log.h>
@@ -39,9 +42,6 @@ SPDX-License-Identifier: MIT
 #include <mipi_display.h>
 #include <bitmap.h>
 #include <hagl.h>
-
-#include "sdkconfig.h"
-#include "hagl_hal.h"
 
 #ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
