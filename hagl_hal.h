@@ -104,7 +104,8 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 void hagl_hal_flush();
 #endif /* CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */
 
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+/* Double buffered INDEX8. */
+#if defined (CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && defined (HAGL_HAL_FORMAT_INDEX8)
 #define HAGL_HAL_USE_BUFFERING
 
 #define HAGL_HAS_HAL_INIT
@@ -120,7 +121,26 @@ void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitma
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 void hagl_hal_flush();
-#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
+#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && (HAGL_HAL_FORMAT_INDEX8) */
+
+/* Double buffered RGB565. */
+#if defined (CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && !defined (HAGL_HAL_FORMAT_INDEX8)
+#define HAGL_HAL_USE_BUFFERING
+
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_SCALE_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
+#define HAGL_HAS_HAL_FLUSH
+
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
+void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
+void hagl_hal_flush();
+#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && (HAGL_HAL_FORMAT_INDEX8) */
 
 #ifdef __cplusplus
 }

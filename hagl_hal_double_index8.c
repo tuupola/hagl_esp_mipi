@@ -34,7 +34,7 @@ SPDX-License-Identifier: MIT
 #include "sdkconfig.h"
 #include "hagl_hal.h"
 
-#if defined (CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && !defined (HAGL_HAL_FORMAT_INDEX8)
+#if defined (CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && defined (HAGL_HAL_FORMAT_INDEX8)
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -43,6 +43,7 @@ SPDX-License-Identifier: MIT
 #include <string.h>
 #include <mipi_display.h>
 #include <bitmap.h>
+#include <rgb332.h>
 #include <hagl.h>
 
 #include "hagl_hal.h"
@@ -66,7 +67,7 @@ static const char *TAG = "hagl_esp_mipi";
  */
 bitmap_t *hagl_hal_init(void)
 {
-    ESP_LOGI(TAG, "RGB565 mode with double buffering.\n");
+    ESP_LOGI(TAG, "INDEX8 mode with double buffering.");
 
     mipi_display_init(&spi);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -74,7 +75,7 @@ bitmap_t *hagl_hal_init(void)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 
     ESP_LOGI(
-        TAG, "Largest (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) free block: %d\n",
+        TAG, "Largest (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) free block: %d",
         heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
     );
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
@@ -86,7 +87,7 @@ bitmap_t *hagl_hal_init(void)
         ESP_LOGE(TAG, "NO BUFFER 1");
     };
     ESP_LOGI(
-        TAG, "Largets (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) free block: %d\n",
+        TAG, "Largest (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) free block: %d",
         heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
     );
 
@@ -100,15 +101,25 @@ bitmap_t *hagl_hal_init(void)
  */
 void hagl_hal_flush()
 {
+    static uint16_t line[DISPLAY_WIDTH];
+    uint16_t *dstptr = line;
+    color_t *srcptr = (color_t *) buffer1;
+
+    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
+        for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
+            *(dstptr++) = rgb332_to_rgb565(*(srcptr++));
+        }
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    /* Flush the whole back buffer with locking. */
-    xSemaphoreTake(mutex, portMAX_DELAY);
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-    xSemaphoreGive(mutex);
+        xSemaphoreTake(mutex, portMAX_DELAY);
+        mipi_display_write(spi, 0, y, DISPLAY_WIDTH, 1, (uint8_t *) line);
+        xSemaphoreGive(mutex);
 #else
-    /* Flush the whole back buffer. */
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+        mipi_display_write(spi, 0, y, DISPLAY_WIDTH, 1, (uint8_t *) line);
+#endif
+        dstptr = line;
+
+    }
+/* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
 /*
