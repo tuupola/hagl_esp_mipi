@@ -47,7 +47,7 @@ SPDX-License-Identifier: MIT
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
 static SemaphoreHandle_t mutex;
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-static uint8_t *buffer1;
+static color_t *buffer1;
 
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
@@ -73,7 +73,7 @@ bitmap_t *hagl_hal_init(void)
         heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
     );
     heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
-    buffer1 = (uint8_t *) heap_caps_malloc(
+    buffer1 = (color_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );

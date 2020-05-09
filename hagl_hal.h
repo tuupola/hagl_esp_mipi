@@ -41,6 +41,10 @@ extern "C" {
 #include "sdkconfig.h"
 
 #include <stdint.h>
+
+/* RGB565 colorspace */
+typedef uint16_t color_t;
+
 #include <bitmap.h>
 
 #include <freertos/FreeRTOS.h>
@@ -49,9 +53,6 @@ extern "C" {
 #define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
-
-/* RGB565 colorspace */
-typedef uint16_t color_t;
 
 /* This is the only mandatory function HAL must provide. */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color);

@@ -119,11 +119,11 @@ bitmap_t *hagl_hal_init(void)
  */
 void hagl_hal_flush()
 {
-    color_t *buffer = fb.buffer;
-    if (fb.buffer == buffer1) {
-        fb.buffer = buffer2;
+    uint8_t *buffer = fb.buffer;
+    if (fb.buffer == (uint8_t *) buffer1) {
+        fb.buffer = (uint8_t *) buffer2;
     } else {
-        fb.buffer = buffer1;
+        fb.buffer = (uint8_t *) buffer1;
     }
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
 }
