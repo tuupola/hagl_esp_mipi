@@ -32,6 +32,7 @@ SPDX-License-Identifier: MIT
 */
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
 #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
 
@@ -44,10 +45,9 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#include "hagl_hal.h"
 
-static uint8_t *buffer1;
-static uint8_t *buffer2;
+static color_t *buffer1;
+static color_t *buffer2;
 
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
@@ -76,7 +76,7 @@ bitmap_t *hagl_hal_init(void)
     );
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    buffer1 = (uint8_t *) heap_caps_malloc(
+    buffer1 = (color_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
@@ -96,7 +96,7 @@ bitmap_t *hagl_hal_init(void)
     );
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    buffer2 = (uint8_t *) heap_caps_malloc(
+    buffer2 = (color_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
@@ -119,7 +119,7 @@ bitmap_t *hagl_hal_init(void)
  */
 void hagl_hal_flush()
 {
-    uint8_t *buffer = fb.buffer;
+    color_t *buffer = fb.buffer;
     if (fb.buffer == buffer1) {
         fb.buffer = buffer2;
     } else {
@@ -134,7 +134,7 @@ void hagl_hal_flush()
  * This is the only mandatory function which HAL must implement for HAGL
  * to be able to draw graphical primitives.
  */
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
     uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
@@ -159,9 +159,9 @@ void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitma
 /*
  * Accelerated horizontal line drawing
  */
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x < width; x++) {
         *ptr++ = color;
     }
@@ -170,9 +170,9 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing
  */
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
