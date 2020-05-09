@@ -34,7 +34,7 @@ SPDX-License-Identifier: MIT
 #include "sdkconfig.h"
 #include "hagl_hal.h"
 
-#if defined (CONFIG_HAGL_HAL_NO_BUFFERING) && !defined (HAGL_HAL_FORMAT_INDEX8)
+#if defined (CONFIG_HAGL_HAL_NO_BUFFERING) && defined (HAGL_HAL_FORMAT_INDEX8)
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -45,6 +45,7 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
+#include "rgb332.h"
 #include "hagl_hal.h"
 
 static spi_device_handle_t spi;
@@ -55,22 +56,15 @@ static const char *TAG = "hagl_esp_mipi";
  */
 bitmap_t *hagl_hal_init(void)
 {
-    ESP_LOGI(TAG, "RGB565 model without buffering.\n");
+    ESP_LOGI(TAG, "INDEX8 mode without buffering.\n");
     mipi_display_init(&spi);
     return NULL;
 }
 
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
-    mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
-}
-
-/*
- * Blit the source bitmap the display
- */
-void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
-{
-    mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
+    uint16_t rgb565 = rgb332_to_rgb565(color);
+    mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &rgb565);
 }
 
 /*
@@ -78,12 +72,12 @@ void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
  */
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
-    static color_t line[DISPLAY_WIDTH];
-    color_t *ptr = line;
+    static uint16_t line[DISPLAY_WIDTH];
+    uint16_t *ptr = line;
     uint16_t height = 1;
 
     for (uint16_t x = 0; x < width; x++) {
-        *(ptr++) = color;
+        *(ptr++) = rgb332_to_rgb565(color);
     }
 
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
@@ -94,12 +88,12 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
  */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
-    color_t line[DISPLAY_HEIGHT];
-    color_t *ptr = line;
+    uint16_t line[DISPLAY_HEIGHT];
+    uint16_t *ptr = line;
     uint16_t width = 1;
 
     for (uint16_t x = 0; x < height; x++) {
-        *(ptr++) = color;
+        *(ptr++) = rgb332_to_rgb565(color);
     }
 
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
