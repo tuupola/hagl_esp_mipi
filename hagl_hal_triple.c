@@ -46,8 +46,8 @@ SPDX-License-Identifier: MIT
 #include <hagl.h>
 
 
-static color_t *buffer1;
-static color_t *buffer2;
+static uint8_t *buffer1;
+static uint8_t *buffer2;
 
 static bitmap_t fb = {
     .width = DISPLAY_WIDTH,
@@ -76,7 +76,7 @@ bitmap_t *hagl_hal_init(void)
     );
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    buffer1 = (color_t *) heap_caps_malloc(
+    buffer1 = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
@@ -96,7 +96,7 @@ bitmap_t *hagl_hal_init(void)
     );
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    buffer2 = (color_t *) heap_caps_malloc(
+    buffer2 = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA | MALLOC_CAP_32BIT
     );
@@ -120,10 +120,10 @@ bitmap_t *hagl_hal_init(void)
 void hagl_hal_flush()
 {
     uint8_t *buffer = fb.buffer;
-    if (fb.buffer == (uint8_t *) buffer1) {
-        fb.buffer = (uint8_t *) buffer2;
+    if (fb.buffer == buffer1) {
+        fb.buffer = buffer2;
     } else {
-        fb.buffer = (uint8_t *) buffer1;
+        fb.buffer = buffer1;
     }
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
 }
@@ -136,7 +136,7 @@ void hagl_hal_flush()
  */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
 }
 
