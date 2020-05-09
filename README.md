@@ -21,7 +21,7 @@ You can alter  HAL behaviour via `menuconfig`. If you choose to use back buffer 
 $ make menuconfig
 ```
 
-For example usage see [M5Stack GFX](https://github.com/tuupola/esp-examples/tree/master/009-m5stack-gfx), [M5Stick GFX](https://github.com/tuupola/esp-examples/tree/master/015-m5stick-gfx) and [Mandelbrot](https://github.com/tuupola/esp-examples/tree/master/014-mandelbrot).
+For example usage see [ESP GFX](https://github.com/tuupola/esp_gfx), [ESP effects](https://github.com/tuupola/esp_effects) and [Mandelbrot](https://github.com/tuupola/esp-examples/tree/master/014-mandelbrot).
 
 ## License
 

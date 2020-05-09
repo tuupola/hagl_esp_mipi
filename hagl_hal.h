@@ -38,6 +38,8 @@ SPDX-License-Identifier: MIT
 extern "C" {
 #endif
 
+#include "sdkconfig.h"
+
 #include <stdint.h>
 #include <bitmap.h>
 
@@ -48,23 +50,60 @@ extern "C" {
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (16)
 
+/* This is the only mandatory function HAL must provide. */
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
+
+/* No buffering is the default. */
+#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
+
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
+#endif /* CONFIG_HAGL_HAL_NO_BUFFERING */
+
+#ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
+#define HAGL_HAL_USE_BUFFERING
+
+#define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_BLIT
 #define HAGL_HAS_HAL_SCALE_BLIT
 #define HAGL_HAS_HAL_HLINE
 #define HAGL_HAS_HAL_VLINE
-#define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_FLUSH
 
 /* RGB565 colorspace */
 typedef uint16_t color_t;
 
 bitmap_t *hagl_hal_init(void);
-void hagl_hal_flush();
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color);
 void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
+void hagl_hal_flush();
+#endif /* CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */
+
+#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#define HAGL_HAL_USE_BUFFERING
+
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_SCALE_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
+#define HAGL_HAS_HAL_FLUSH
+
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
+void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src);
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, uint16_t color);
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, uint16_t color);
+void hagl_hal_flush();
+#endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 
 #ifdef __cplusplus
 }
