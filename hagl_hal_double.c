@@ -69,17 +69,24 @@ bitmap_t *hagl_hal_init(void)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 
     ESP_LOGI(
-        TAG, "Heap (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) when starting: %d",
+        TAG, "Largest (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) block before init: %d",
         heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
     );
-    heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
+
     buffer1 = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+        MALLOC_CAP_DMA
     );
     if (NULL == buffer1) {
         ESP_LOGE(TAG, "NO BUFFER 1");
     };
+
+    ESP_LOGI(
+        TAG, "Largest (MALLOC_CAP_DMA | MALLOC_CAP_32BIT) block after init: %d",
+        heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
+    );
+
+    heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
     bitmap_init(&fb, buffer1);
 
