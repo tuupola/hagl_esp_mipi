@@ -32,6 +32,7 @@ SPDX-License-Identifier: MIT
 */
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
 #ifdef CONFIG_HAGL_HAL_NO_BUFFERING
 
@@ -44,7 +45,6 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#include "hagl_hal.h"
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
@@ -58,7 +58,7 @@ bitmap_t *hagl_hal_init(void)
     return NULL;
 }
 
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 }
@@ -74,10 +74,10 @@ void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 /*
  * Accelerated horizontal line drawing
  */
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
-    static uint16_t line[DISPLAY_WIDTH];
-    uint16_t *ptr = line;
+    static color_t line[DISPLAY_WIDTH];
+    color_t *ptr = line;
     uint16_t height = 1;
 
     for (uint16_t x = 0; x < width; x++) {
@@ -90,10 +90,10 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing
  */
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
-    uint16_t line[DISPLAY_HEIGHT];
-    uint16_t *ptr = line;
+    static color_t line[DISPLAY_HEIGHT];
+    color_t *ptr = line;
     uint16_t width = 1;
 
     for (uint16_t x = 0; x < height; x++) {

@@ -32,6 +32,7 @@ SPDX-License-Identifier: MIT
 */
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
 #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
 
@@ -44,7 +45,6 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#include "hagl_hal.h"
 
 static uint8_t *buffer1;
 static uint8_t *buffer2;
@@ -134,9 +134,9 @@ void hagl_hal_flush()
  * This is the only mandatory function which HAL must implement for HAGL
  * to be able to draw graphical primitives.
  */
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, uint16_t color)
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
 }
 
@@ -159,9 +159,9 @@ void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitma
 /*
  * Accelerated horizontal line drawing
  */
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t x = 0; x < width; x++) {
         *ptr++ = color;
     }
@@ -170,9 +170,9 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, uint16_t color)
 /*
  * Accelerated vertical line drawing
  */
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, uint16_t color)
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
-    uint16_t *ptr = (uint16_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     for (uint16_t y = 0; y < height; y++) {
         *ptr = color;
         ptr += fb.pitch / (fb.depth / 8);
