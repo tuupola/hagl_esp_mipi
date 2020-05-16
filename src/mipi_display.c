@@ -49,6 +49,7 @@ SPDX-License-Identifier: MIT
 #include <esp_log.h>
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 #include "mipi_dcs.h"
 #include "mipi_display.h"
 
@@ -256,7 +257,7 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
     data.rxlength = 0;
     data.tx_buffer = buffer;
     /* Transfer size in bits */
-    data.length = size * DISPLAY_DEPTH;
+    data.length = size * HAGL_HAL_HARDWARE_DEPTH;
     /* Clear SPI_TRANS_USE_TXDATA flag */
     data.flags = 0;
 
