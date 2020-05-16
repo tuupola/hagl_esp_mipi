@@ -6,16 +6,15 @@ HAL for HAGL graphics library for display drivers supporting the [MIPI Display C
 
 ## Usage
 
-To use with an ESP-IDF project you need to include three components. Low level [MIPI DCS display driver](https://github.com/tuupola/esp_mipi), this HAL and the [HAGL graphics library](https://github.com/tuupola/hagl) itself.
+To use with an ESP-IDF project you include this HAL and the [HAGL graphics library](https://github.com/tuupola/hagl) itself.
 
 ```
 $ cd components
-$ git submodule add git@github.com:tuupola/esp_mipi.git
 $ git submodule add git@github.com:tuupola/hagl_esp_mipi.git
 $ git submodule add git@github.com:tuupola/hagl.git
 ```
 
-You can alter  HAL behaviour via `menuconfig`. If you choose to use back buffer all drawing operations will be fast. Downside is that back buffer requires lot of memory. Each pixel is two bytes. To reduce the amount of data SPI bus has to transfer choose the option to flush only dirty part of back buffer. To reduce flickering you can also choose to lock back buffer while flushing. Locking will slow down draw operations though.
+You can alter display behaviour via `menuconfig`. If you choose to use back buffer all drawing operations will be fast. Downside is that back buffer requires lot of memory. To reduce flickering you can also choose to lock back buffer while flushing. Locking will slow down draw operations though.
 
 ```
 $ make menuconfig
