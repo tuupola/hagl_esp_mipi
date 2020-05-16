@@ -31,32 +31,31 @@ SPDX-License-Identifier: MIT
 
 */
 
-#ifndef _HAGL_HAL_H
-#define _HAGL_HAL_H
+#ifndef _HAGL_HAL_SINGLE_H
+#define _HAGL_HAL_SINGLE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "sdkconfig.h"
+#include <stdint.h>
+#include <bitmap.h>
 
-#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
-#include "hagl_hal_single.h"
-#endif
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
 
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
-#include "hagl_hal_double.h"
-#endif
+/* RGB565 colorspace */
+typedef uint16_t color_t;
 
-#ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
-#include "hagl_hal_double.h"
-#endif
-
-#define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define DISPLAY_DEPTH       (16)
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color);
+bitmap_t *hagl_hal_init(void);
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _HAGL_HAL_H */
+#endif /* _HAGL_HAL_SINGLE_H */
