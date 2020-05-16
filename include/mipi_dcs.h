@@ -31,8 +31,12 @@ SPDX-License-Identifier: MIT
 
 */
 
-#ifndef _DCS_H
-#define _DCS_H
+#ifndef _MIPI_DCS_H
+#define _MIPI_DCS_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MIPI_DCS_NOP                        0x00
 #define MIPI_DCS_SOFT_RESET                 0x01
@@ -107,4 +111,7 @@ SPDX-License-Identifier: MIT
 #define MIPI_DCS_ADDRESS_MODE_FLIP_X        0x02
 #define MIPI_DCS_ADDRESS_MODE_FLIP_Y        0x01
 
+#ifdef __cplusplus
+}
 #endif
+#endif /* _MIPI_DCS_H */
