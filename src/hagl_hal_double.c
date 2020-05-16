@@ -43,7 +43,7 @@ SPDX-License-Identifier: MIT
 #include <bitmap.h>
 #include <hagl.h>
 
-#ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
+#if defined (CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING) && !defined (HAGL_HAL_FORMAT_INDEX8)
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
 static SemaphoreHandle_t mutex;
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */

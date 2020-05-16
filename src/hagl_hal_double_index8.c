@@ -78,6 +78,7 @@ bitmap_t *hagl_hal_init(void)
         b = 64;
         palette[i] = rgb565(r, g, b);
     }
+    palette[0] = 0x0000;
 
     mipi_display_init(&spi);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -114,15 +115,23 @@ bitmap_t *hagl_hal_init(void)
  */
 void hagl_hal_flush()
 {
+    static uint16_t line[DISPLAY_WIDTH];
+    uint16_t *dstptr = line;
+    color_t *srcptr = (color_t *) buffer1;
+
+    for (uint16_t y = 0; y < DISPLAY_HEIGHT; y++) {
+        for (uint16_t x = 0; x < DISPLAY_WIDTH; x++) {
+            *(dstptr++) = palette[*(srcptr++)];
+        }
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    /* Flush the whole back buffer with locking. */
-    xSemaphoreTake(mutex, portMAX_DELAY);
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-    xSemaphoreGive(mutex);
+        xSemaphoreTake(mutex, portMAX_DELAY);
+        mipi_display_write(spi, 0, y, DISPLAY_WIDTH, 1, (uint8_t *) line);
+        xSemaphoreGive(mutex);
 #else
-    /* Flush the whole back buffer. */
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+        mipi_display_write(spi, 0, y, 240, 1, (uint8_t *) line);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+        dstptr = line;
+    }
 }
 
 /*
