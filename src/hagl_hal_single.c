@@ -49,9 +49,6 @@ SPDX-License-Identifier: MIT
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-/*
- * Initializes the MIPI display
- */
 bitmap_t *hagl_hal_init(void)
 {
     mipi_display_init(&spi);
@@ -63,17 +60,11 @@ void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 }
 
-/*
- * Blit the source bitmap the display
- */
 void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
     mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
 }
 
-/*
- * Accelerated horizontal line drawing
- */
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
     static color_t line[DISPLAY_WIDTH];
@@ -87,9 +78,6 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 }
 
-/*
- * Accelerated vertical line drawing
- */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
     static color_t line[DISPLAY_HEIGHT];

@@ -58,9 +58,6 @@ static bitmap_t fb = {
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-/*
- * Initializes the MIPI display with double buffering
- */
 bitmap_t *hagl_hal_init(void)
 {
     mipi_display_init(&spi);
@@ -93,9 +90,6 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-/*
- * Flushes the backbuffer contents to the display
- */
 void hagl_hal_flush()
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -109,12 +103,6 @@ void hagl_hal_flush()
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
-/*
- * Put a pixel to the display
- *
- * This is the only mandatory function which HAL must implement for HAGL
- * to be able to draw graphical primitives.
- */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -127,9 +115,6 @@ void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
-/*
- * Blit the source bitmap the display
- */
 void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -141,9 +126,6 @@ void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
-/*
- * Blit the source bitmap to the display scaled up or down
- */
 void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -155,9 +137,6 @@ void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitma
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
-/*
- * Accelerated horizontal line drawing
- */
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -172,9 +151,6 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
-/*
- * Accelerated vertical line drawing
- */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
