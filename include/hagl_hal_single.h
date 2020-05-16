@@ -41,13 +41,12 @@ extern "C" {
 #include <stdint.h>
 #include <bitmap.h>
 
+#include "hagl_hal.h"
+
 #define HAGL_HAS_HAL_INIT
 #define HAGL_HAS_HAL_BLIT
 #define HAGL_HAS_HAL_HLINE
 #define HAGL_HAS_HAL_VLINE
-
-/* RGB565 colorspace */
-typedef uint16_t color_t;
 
 /**
  * Put a pixel

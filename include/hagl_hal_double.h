@@ -41,8 +41,7 @@ extern "C" {
 #include <stdint.h>
 #include <bitmap.h>
 
-/* RGB565 colorspace */
-typedef uint16_t color_t;
+#include "hagl_hal.h"
 
 #define HAGL_HAL_USE_BUFFERING
 #define HAGL_HAS_HAL_INIT

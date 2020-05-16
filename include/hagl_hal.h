@@ -38,7 +38,32 @@ SPDX-License-Identifier: MIT
 extern "C" {
 #endif
 
+#include <stdint.h>
 #include "sdkconfig.h"
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_24BIT_SELECTED
+typedef uint32_t color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_18BIT_SELECTED
+typedef uint32_t color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_16BIT_SELECTED
+typedef uint16_t color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_12BIT_SELECTED
+typedef uint16_t color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_8BIT_SELECTED
+typedef uint8_t color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_3BIT_SELECTED
+typedef uint8_t color_t;
+#endif
 
 #ifdef CONFIG_HAGL_HAL_NO_BUFFERING
 #include "hagl_hal_single.h"
@@ -49,12 +74,12 @@ extern "C" {
 #endif
 
 #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
-#include "hagl_hal_double.h"
+#include "hagl_hal_triple.h"
 #endif
 
 #define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define DISPLAY_DEPTH       (16)
+#define DISPLAY_DEPTH       (CONFIG_MIPI_DISPLAY_DEPTH)
 
 #ifdef __cplusplus
 }

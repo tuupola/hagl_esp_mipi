@@ -39,10 +39,11 @@ SPDX-License-Identifier: MIT
 #include <driver/spi_master.h>
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
-#define DISPLAY_WIDTH   (CONFIG_MIPI_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT  (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define DISPLAY_DEPTH   (16)
+// #define DISPLAY_WIDTH   (CONFIG_MIPI_DISPLAY_WIDTH)
+// #define DISPLAY_HEIGHT  (CONFIG_MIPI_DISPLAY_HEIGHT)
+// #define DISPLAY_DEPTH   (CONFIG_MIPI_DISPLAY_DEPTH)
 
 #define SPI_MAX_TRANSFER_SIZE   (DISPLAY_WIDTH * DISPLAY_HEIGHT * DISPLAY_DEPTH)
 
