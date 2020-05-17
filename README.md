@@ -31,4 +31,4 @@ For example usage see [ESP GFX](https://github.com/tuupola/esp_gfx), [ESP effect
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](LICENSE.txt) for more information.
