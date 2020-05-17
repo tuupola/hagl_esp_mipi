@@ -50,6 +50,7 @@ typedef uint32_t color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_16BIT_SELECTED
+/* Currently only this, ie. RGB565 is properly tested. */
 typedef uint16_t color_t;
 #endif
 

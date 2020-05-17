@@ -29,6 +29,16 @@ https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
+-cut-
+
+This is the HAL used when double buffering is enabled. The GRAM of the
+display driver chip is the framebuffer. The memory allocated by this HAL
+is the back buffer. Total two buffers.
+
+Note that all coordinates are already clipped in the main library itself.
+HAL does not need to validate the coordinates, they can alway be assumed
+valid.
+
 */
 
 #ifndef _HAGL_HAL_DOUBLE_H
