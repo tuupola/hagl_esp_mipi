@@ -35,14 +35,22 @@ SPDX-License-Identifier: MIT
 
 */
 
+#ifndef _MIPI_DISPLAY_H
+#define _MIPI_DISPLAY_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <driver/spi_master.h>
 
 #include "sdkconfig.h"
+#include "hagl_hal.h"
 
-#define DISPLAY_WIDTH   (CONFIG_MIPI_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT  (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define DISPLAY_DEPTH   (16)
+// #define DISPLAY_WIDTH   (CONFIG_MIPI_DISPLAY_WIDTH)
+// #define DISPLAY_HEIGHT  (CONFIG_MIPI_DISPLAY_HEIGHT)
+// #define DISPLAY_DEPTH   (CONFIG_MIPI_DISPLAY_DEPTH)
 
 #define SPI_MAX_TRANSFER_SIZE   (DISPLAY_WIDTH * DISPLAY_HEIGHT * DISPLAY_DEPTH)
 
@@ -65,3 +73,8 @@ void mipi_display_init(spi_device_handle_t *spi);
 void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer);
 void mipi_display_ioctl(spi_device_handle_t spi, uint8_t command, uint8_t *data, size_t size);
 void mipi_display_close(spi_device_handle_t spi);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* _MIPI_DISPLAY_H */

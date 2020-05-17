@@ -40,64 +40,69 @@ valid.
 
 */
 
-#include "sdkconfig.h"
+#ifndef _HAGL_HAL_SINGLE_H
+#define _HAGL_HAL_SINGLE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <stdint.h>
+#include <bitmap.h>
+
 #include "hagl_hal.h"
 
-#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
+#define HAGL_HAS_HAL_INIT
+#define HAGL_HAS_HAL_BLIT
+#define HAGL_HAS_HAL_HLINE
+#define HAGL_HAS_HAL_VLINE
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
-#include <esp_log.h>
-#include <esp_heap_caps.h>
-#include <string.h>
-#include <mipi_display.h>
-#include <bitmap.h>
-#include <hagl.h>
+/**
+ * Put a pixel
+ *
+ * @param x0 X coordinate
+ * @param y0 Y coorginate
+ * @param color RGB565 color
+ */
+void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color);
 
+/**
+ * Initialize the HAL
+ *
+ * This HAL returns null since it does not use buffering.
+ *
+ * @return NULL
+ */
+bitmap_t *hagl_hal_init(void);
 
-static spi_device_handle_t spi;
-static const char *TAG = "hagl_esp_mipi";
+/**
+ * Blit given bitmap to the display
+ *
+ * @param x0 X coordinate
+ * @param y0 Y coorginate
+ * @param src Pointer to the source bitmap
+ */
+void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src);
 
-bitmap_t *hagl_hal_init(void)
-{
-    mipi_display_init(&spi);
-    return NULL;
+/**
+ * Draw a horizontal line
+ *
+ * @param x0 X coordinate
+ * @param y0 Y coorginate
+ * @param w width of the line
+ */
+void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
+
+/**
+ * Draw a vertical line
+ *
+ * @param x0 X coordinate
+ * @param y0 Y coorginate
+ * @param h height of the line
+ */
+void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
+
+#ifdef __cplusplus
 }
-
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
-{
-    mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
-}
-
-void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
-{
-    mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
-}
-
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
-{
-    static color_t line[DISPLAY_WIDTH];
-    color_t *ptr = line;
-    uint16_t height = 1;
-
-    for (uint16_t x = 0; x < width; x++) {
-        *(ptr++) = color;
-    }
-
-    mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
-}
-
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
-{
-    static color_t line[DISPLAY_HEIGHT];
-    color_t *ptr = line;
-    uint16_t width = 1;
-
-    for (uint16_t x = 0; x < height; x++) {
-        *(ptr++) = color;
-    }
-
-    mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
-}
-
-#endif /* CONFIG_HAGL_HAL_NO_BUFFERING */
+#endif
+#endif /* _HAGL_HAL_SINGLE_H */

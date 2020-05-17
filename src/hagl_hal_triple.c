@@ -29,6 +29,16 @@ https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
+-cut-
+
+This is the HAL used when triple buffering is enabled. The GRAM of the
+display driver chip is the framebuffer. The two memory blocks allocated
+by this HAL are the two back buffer. Total three buffers.
+
+Note that all coordinates are already clipped in the main library itself.
+HAL does not need to validate the coordinates, they can alway be assumed
+valid.
+
 */
 
 #include "sdkconfig.h"
@@ -58,9 +68,6 @@ static bitmap_t fb = {
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-/*
- * Initializes the MIPI display with triple buffering
- */
 bitmap_t *hagl_hal_init(void)
 {
     mipi_display_init(&spi);
@@ -114,9 +121,6 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-/*
- * Flushes the optional framebuffer contents to the display
- */
 void hagl_hal_flush()
 {
     uint8_t *buffer = fb.buffer;
@@ -128,37 +132,22 @@ void hagl_hal_flush()
     mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
 }
 
-/*
- * Put a pixel to the display
- *
- * This is the only mandatory function which HAL must implement for HAGL
- * to be able to draw graphical primitives.
- */
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
 {
     color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
     *ptr = color;
 }
 
-/*
- * Blit the source bitmap the display
- */
 void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
 {
     bitmap_blit(x0, y0, src, &fb);
 }
 
-/*
- * Blit the source bitmap to the display scaled up or down
- */
 void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
 {
     bitmap_scale_blit(x0, y0, w, h, src, &fb);
 }
 
-/*
- * Accelerated horizontal line drawing
- */
 void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
     color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
@@ -167,9 +156,6 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
     }
 }
 
-/*
- * Accelerated vertical line drawing
- */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
     color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
