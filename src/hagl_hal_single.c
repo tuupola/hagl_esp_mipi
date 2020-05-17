@@ -29,6 +29,15 @@ https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
+-cut-
+
+This is the HAL used when buffering is disabled. I call this single buffered
+since I consider the GRAM of the display driver chip to be the framebuffer.
+
+Note that all coordinates are already clipped in the main library itself.
+HAL does not need to validate the coordinates, they can alway be assumed
+valid.
+
 */
 
 #include "sdkconfig.h"
