@@ -176,5 +176,26 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
+void hagl_hal_fill_rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, color_t color)
+{
+    uint16_t width = x1 - x0 + 1;
+    uint16_t height = y1 - y0 + 1;
+
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+
+    for (uint16_t y = 0; y < height; y++) {
+        for (uint16_t x = 0; x < width; x++) {
+            *ptr++ = color;
+        }
+        ptr = (color_t *) (fb.buffer + fb.pitch * (y0 + y) + (fb.depth / 8) * x0);
+    }
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 

@@ -115,6 +115,9 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
  */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 
+void hagl_hal_fill_rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, color_t color);
+
+
 /**
  * Flush back buffer to the display
  */
