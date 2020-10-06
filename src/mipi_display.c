@@ -44,6 +44,7 @@ SPDX-License-Identifier: MIT
 #include <freertos/task.h>
 #include <esp_system.h>
 #include <driver/spi_master.h>
+#include <driver/ledc.h>
 #include <soc/gpio_struct.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
@@ -193,13 +194,39 @@ void mipi_display_init(spi_device_handle_t *spi)
         cmd++;
     }
 
-    ESP_LOGI(TAG, "Display initialized.");
-
     /* Enable backlight */
     if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 1);
+
+        /* Enable backlight PWM */
+        if (CONFIG_MIPI_DISPLAY_BL_PWM > 0) {
+            ESP_LOGI(TAG, "Initializing backlight PWM");
+            ledc_timer_config_t ledc_timer = {
+                .duty_resolution = LEDC_TIMER_13_BIT,
+                .freq_hz = 9765,
+                .speed_mode = LEDC_HIGH_SPEED_MODE,
+                .timer_num = LEDC_TIMER_0,
+                .clk_cfg = LEDC_AUTO_CLK,
+            };
+
+            ledc_timer_config(&ledc_timer);
+
+            ledc_channel_config_t ledc_channel = {
+                .channel    = LEDC_CHANNEL_0,
+                .duty       = CONFIG_MIPI_DISPLAY_BL_PWM,
+                .gpio_num   = CONFIG_MIPI_DISPLAY_PIN_BL,
+                .speed_mode = LEDC_HIGH_SPEED_MODE,
+                .hpoint     = 0,
+                .timer_sel  = LEDC_TIMER_0,
+            };
+
+            ledc_channel_config(&ledc_channel);
+        }
+
     }
+
+    ESP_LOGI(TAG, "Display initialized.");
 
     spi_device_acquire_bus(*spi, portMAX_DELAY);
 }
