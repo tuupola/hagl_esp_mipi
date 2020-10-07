@@ -158,4 +158,15 @@ config MIPI_DISPLAY_PIN_BL
     int "Backlight pin number"
     default 32
 
+if MIPI_DISPLAY_PIN_BL != -1
+    config MIPI_DISPLAY_PWM_BL
+        int "Backlight PWM duty cycle (brightness)"
+        range -1 8191
+        default -1
+        help
+            When enabled starts the LEDC periphal on the backlight pin with
+            the given duty cycle. Value of -1 to disables PWM and simply
+            drives the backlight pin high.
+endif
+
 endmenu
