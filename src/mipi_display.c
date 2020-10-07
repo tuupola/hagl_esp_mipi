@@ -202,7 +202,7 @@ void mipi_display_init(spi_device_handle_t *spi)
         /* Enable backlight PWM */
         if (CONFIG_MIPI_DISPLAY_BL_PWM > 0) {
             ESP_LOGI(TAG, "Initializing backlight PWM");
-            ledc_timer_config_t ledc_timer = {
+            ledc_timer_config_t timercfg = {
                 .duty_resolution = LEDC_TIMER_13_BIT,
                 .freq_hz = 9765,
                 .speed_mode = LEDC_HIGH_SPEED_MODE,
@@ -210,9 +210,9 @@ void mipi_display_init(spi_device_handle_t *spi)
                 .clk_cfg = LEDC_AUTO_CLK,
             };
 
-            ledc_timer_config(&ledc_timer);
+            ledc_timer_config(&timercfg);
 
-            ledc_channel_config_t ledc_channel = {
+            ledc_channel_config_t channelcfg = {
                 .channel    = LEDC_CHANNEL_0,
                 .duty       = CONFIG_MIPI_DISPLAY_BL_PWM,
                 .gpio_num   = CONFIG_MIPI_DISPLAY_PIN_BL,
@@ -221,7 +221,7 @@ void mipi_display_init(spi_device_handle_t *spi)
                 .timer_sel  = LEDC_TIMER_0,
             };
 
-            ledc_channel_config(&ledc_channel);
+            ledc_channel_config(&channelcfg);
         }
 
     }
