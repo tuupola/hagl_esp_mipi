@@ -159,7 +159,7 @@ config MIPI_DISPLAY_PIN_BL
     default 32
 
 if MIPI_DISPLAY_PIN_BL != -1
-    config MIPI_DISPLAY_BL_PWM
+    config MIPI_DISPLAY_PWM_BL
         int "Backlight PWM duty cycle (brightness)"
         range -1 8191
         default -1
