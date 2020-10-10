@@ -169,4 +169,8 @@ if MIPI_DISPLAY_PIN_BL != -1
             drives the backlight pin high.
 endif
 
+config MIPI_DISPLAY_PWM_BL
+    int
+    default -1 if MIPI_DISPLAY_PIN_BL = -1
+
 endmenu
