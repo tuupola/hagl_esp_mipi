@@ -14,6 +14,16 @@ $ git submodule add git@github.com:tuupola/hagl_esp_mipi.git
 $ git submodule add git@github.com:tuupola/hagl.git
 ```
 
+**NOTE!**
+
+If you are using CMake based build the HAL must be in folder named `hagl_hal`. To install use the following instead.
+
+```
+$ cd components
+$ git submodule add git@github.com:tuupola/hagl_esp_mipi.git hagl_hal
+$ git submodule add git@github.com:tuupola/hagl.git
+```
+
 You can alter display behaviour via `menuconfig`. If you choose to use back buffer all drawing operations will be fast. Downside is that back buffer requires lot of memory. To reduce flickering you can also choose to lock back buffer while flushing. Locking will slow down draw operations though.
 
 ```
