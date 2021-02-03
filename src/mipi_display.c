@@ -151,7 +151,7 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .clock_speed_hz = CONFIG_SPI_CLOCK_SPEED_HZ,
         .mode = 0,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
-        .queue_size = 64,
+        .queue_size = 7,
         /* Handles the D/C line */
         .pre_cb = mipi_display_pre_callback,
         .flags = SPI_DEVICE_NO_DUMMY

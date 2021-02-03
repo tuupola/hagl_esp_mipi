@@ -102,6 +102,13 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t w, color_t color);
  */
 void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
 
+
+uint8_t* hagl_hal_get_DMA_buf();
+
+uint32_t hagl_hal_get_DMA_buf_size();
+
+void hagl_hal_fast_blit(uint16_t x0, uint16_t y0, uint16_t x1,uint16_t y1);
+
 #ifdef __cplusplus
 }
 #endif
