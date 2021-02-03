@@ -6,7 +6,7 @@
 #
 # To use it copy it to your project root before running menuconfig.
 #
-# $ cp components/esp_mipi/sdkconfig/m5stickc-landscape.defaults sdkconfig.defaults
+# $ cp components/hagl_hal/sdkconfig/m5stickc-landscape.defaults sdkconfig.defaults
 # $ make menuconfig
 
 CONFIG_MIPI_DCS_ADDRESS_MODE_MIRROR_X_SELECTED=y

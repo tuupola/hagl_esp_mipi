@@ -33,7 +33,7 @@ $ make menuconfig
 [Default configs](https://github.com/tuupola/hagl_esp_mipi/tree/master/sdkconfig/) are provided for popular dev boards. For example to compile for M5Stack do something like the following:
 
 ```
-$ cp components/hagl_esp_mipi/sdkconfig/m5stack.defaults sdkconfig.defaults
+$ cp components/hagl_hal/sdkconfig/m5stack.defaults sdkconfig.defaults
 $ make menuconfig
 ```
 
