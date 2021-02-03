@@ -121,7 +121,7 @@ config MIPI_DCS_ADDRESS_MODE_BGR
     default 0x00 if !MIPI_DCS_ADDRESS_MODE_BGR_SELECTED
     default 0x08 if MIPI_DCS_ADDRESS_MODE_BGR_SELECTED
 
-config SPI_CLOCK_SPEED_HZ
+config MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ
     int "SPI clock speed in Hz"
     default 40000000
     range 0 80000000
