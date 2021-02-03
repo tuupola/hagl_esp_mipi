@@ -88,6 +88,7 @@ config MIPI_DISPLAY_DEPTH
     default 8 if MIPI_DCS_PIXEL_FORMAT_8BIT_SELECTED
     default 3 if MIPI_DCS_PIXEL_FORMAT_3BIT_SELECTED
 
+
 choice
     prompt "Buffering"
     default HAGL_HAL_NO_BUFFERING
@@ -103,6 +104,20 @@ config HAGL_HAL_LOCK_WHEN_FLUSHING
     bool "Lock back buffer when flushing"
     default n
     depends on HAGL_HAL_USE_DOUBLE_BUFFERING
+
+config MIPI_DISPLAY_USE_DMA_BUFFER
+    bool "Use an intermediary DMA cache"
+    default y
+    help
+        Use an intermediary DMA cache to copy the memory of the bitmap. The bitmap memory can be placed anywhere such as: PSRAM
+
+if MIPI_DISPLAY_USE_DMA_BUFFER
+    config MIPI_DISPLAY_DMA_BUFFER_SIZE
+        int "Display DMA Buffer Size"
+        default 38400
+        help
+            It's should be align with you display width,depends on your memory setting.(default 120*320)
+endif
 
 config MIPI_DISPLAY_WIDTH
     int "Display width in pixels"
