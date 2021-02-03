@@ -151,13 +151,13 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .clock_speed_hz = CONFIG_SPI_CLOCK_SPEED_HZ,
         .mode = 0,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
-        .queue_size = 64,
+        .queue_size = 7,
         /* Handles the D/C line */
         .pre_cb = mipi_display_pre_callback,
         .flags = SPI_DEVICE_NO_DUMMY
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(HSPI_HOST, &buscfg, 1));
-    ESP_ERROR_CHECK(spi_bus_add_device(HSPI_HOST, &devcfg, spi));
+    ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_SPI_HOST, &buscfg, 1));
+    ESP_ERROR_CHECK(spi_bus_add_device(CONFIG_SPI_HOST, &devcfg, spi));
 }
 
 void mipi_display_init(spi_device_handle_t *spi)
