@@ -60,6 +60,7 @@ extern "C" {
 #define HAGL_HAS_HAL_HLINE
 #define HAGL_HAS_HAL_VLINE
 #define HAGL_HAS_HAL_FLUSH
+#define HAGL_HAS_HAL_FILL_RECTANGLE
 
 /**
  * Put a pixel
