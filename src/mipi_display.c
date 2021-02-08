@@ -244,6 +244,8 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
     int32_t y2 = y1 + h - 1;
     uint32_t size = w * h;
 
+    static int32_t prev_x1, prev_x2, prev_y1, prev_y2;
+
     spi_transaction_t command;
     spi_transaction_t data;
 
@@ -259,23 +261,35 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
     data.user = (void *) 1;
     data.flags = SPI_TRANS_USE_TXDATA;
 
-    command.tx_data[0] = MIPI_DCS_SET_COLUMN_ADDRESS;
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
+    /* Change column address only if it has changed. */
+    if ((prev_x1 != x1 || prev_x2 != x2)) {
+        command.tx_data[0] = MIPI_DCS_SET_COLUMN_ADDRESS;
+        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
 
-    data.tx_data[0] = x1 >> 8;
-    data.tx_data[1] = x1 & 0xff;
-    data.tx_data[2] = x2 >> 8;
-    data.tx_data[3] = x2 & 0xff;
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &data));
+        data.tx_data[0] = x1 >> 8;
+        data.tx_data[1] = x1 & 0xff;
+        data.tx_data[2] = x2 >> 8;
+        data.tx_data[3] = x2 & 0xff;
+        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &data));
 
-    command.tx_data[0] = MIPI_DCS_SET_PAGE_ADDRESS;
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
+        prev_x1 = x1;
+        prev_x2 = x2;
+    }
 
-    data.tx_data[0] = y1 >> 8;
-    data.tx_data[1] = y1 & 0xff;
-    data.tx_data[2] = y2 >> 8;
-    data.tx_data[3] = y2 & 0xff;
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &data));
+    /* Change page address only if it has changed. */
+    if ((prev_y1 != y1 || prev_y2 != y2)) {
+        command.tx_data[0] = MIPI_DCS_SET_PAGE_ADDRESS;
+        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
+
+        data.tx_data[0] = y1 >> 8;
+        data.tx_data[1] = y1 & 0xff;
+        data.tx_data[2] = y2 >> 8;
+        data.tx_data[3] = y2 & 0xff;
+        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &data));
+
+        prev_y1 = y1;
+        prev_y2 = y2;
+    }
 
     command.tx_data[0] = MIPI_DCS_WRITE_MEMORY_START;
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
