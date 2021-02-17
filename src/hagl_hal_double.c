@@ -184,13 +184,20 @@ void hagl_hal_fill_rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, col
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-
-    for (uint16_t y = 0; y < height; y++) {
-        for (uint16_t x = 0; x < width; x++) {
-            *ptr++ = color;
+    if ((width == 2) && (height && 2)) {
+        /* Special case for 2x2 filled rectangles. Speeds up fake half resolution effects. */
+        color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
+        *ptr = color;
+        ++ptr;
+        *ptr = color;
+        ptr += fb.pitch / (fb.depth / 8);
+        *ptr = color;
+        --ptr;
+        *ptr = color;
+    } else {
+        for (uint16_t i = 0; i < height; ++i) {
+            hagl_hal_hline(x0, y0 + i, width, color);
         }
-        ptr = (color_t *) (fb.buffer + fb.pitch * (y0 + y) + (fb.depth / 8) * x0);
     }
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
