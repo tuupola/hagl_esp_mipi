@@ -156,7 +156,9 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .pre_cb = mipi_display_pre_callback,
         .flags = SPI_DEVICE_NO_DUMMY
     };
-    ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_MIPI_DISPLAY_SPI_HOST, &buscfg, 1));
+
+    /* ESP32S2 requires DMA channel to match the SPI host. */
+    ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_MIPI_DISPLAY_SPI_HOST, &buscfg, CONFIG_MIPI_DISPLAY_SPI_HOST));
     ESP_ERROR_CHECK(spi_bus_add_device(CONFIG_MIPI_DISPLAY_SPI_HOST, &devcfg, spi));
 }
 
@@ -205,7 +207,7 @@ void mipi_display_init(spi_device_handle_t *spi)
             ledc_timer_config_t timercfg = {
                 .duty_resolution = LEDC_TIMER_13_BIT,
                 .freq_hz = 9765,
-                .speed_mode = LEDC_HIGH_SPEED_MODE,
+                .speed_mode = LEDC_LOW_SPEED_MODE,
                 .timer_num = LEDC_TIMER_0,
                 .clk_cfg = LEDC_AUTO_CLK,
             };
@@ -216,7 +218,7 @@ void mipi_display_init(spi_device_handle_t *spi)
                 .channel    = LEDC_CHANNEL_0,
                 .duty       = CONFIG_MIPI_DISPLAY_PWM_BL,
                 .gpio_num   = CONFIG_MIPI_DISPLAY_PIN_BL,
-                .speed_mode = LEDC_HIGH_SPEED_MODE,
+                .speed_mode = LEDC_LOW_SPEED_MODE,
                 .hpoint     = 0,
                 .timer_sel  = LEDC_TIMER_0,
             };
