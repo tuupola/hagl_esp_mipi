@@ -128,6 +128,20 @@ config MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ
     help
         SPI clock speed in Hz. If you have problems try a lower value.
 
+choice
+    prompt "SPI HOST"
+    default HSPI_HOST_SELECTED
+    config HSPI_HOST_SELECTED
+        bool "HSPI_HOST"
+    config VSPI_HOST_SELECTED
+        bool "VSPI_HOST"
+endchoice
+
+config MIPI_DISPLAY_SPI_HOST
+    hex
+    default 0x01 if !VSPI_HOST_SELECTED
+    default 0x02 if VSPI_HOST_SELECTED
+
 config MIPI_DISPLAY_PIN_MISO
     int "MISO pin number"
     default -1
