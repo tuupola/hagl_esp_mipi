@@ -38,7 +38,7 @@ config MIPI_DCS_ADDRESS_MODE_FLIP_Y
     default 0x00 if !MIPI_DCS_ADDRESS_MODE_FLIP_Y_SELECTED
     default 0x01 if MIPI_DCS_ADDRESS_MODE_FLIP_Y_SELECTED
 
-choice SPI_HOST
+choice
     prompt "SPI HOST"
     default HSPI_HOST_SELECTED
     config HSPI_HOST_SELECTED
@@ -47,7 +47,7 @@ choice SPI_HOST
         bool "VSPI_HOST"
 endchoice
 
-config SPI_HOST
+config MIPI_DISPLAY_SPI_HOST
     hex
     default 0x01 if !VSPI_HOST_SELECTED
     default 0x02 if VSPI_HOST_SELECTED
