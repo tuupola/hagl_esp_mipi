@@ -38,21 +38,6 @@ config MIPI_DCS_ADDRESS_MODE_FLIP_Y
     default 0x00 if !MIPI_DCS_ADDRESS_MODE_FLIP_Y_SELECTED
     default 0x01 if MIPI_DCS_ADDRESS_MODE_FLIP_Y_SELECTED
 
-choice
-    prompt "SPI HOST"
-    default HSPI_HOST_SELECTED
-    config HSPI_HOST_SELECTED
-        bool "HSPI_HOST"
-    config VSPI_HOST_SELECTED
-        bool "VSPI_HOST"
-endchoice
-
-config MIPI_DISPLAY_SPI_HOST
-    hex
-    default 0x01 if !VSPI_HOST_SELECTED
-    default 0x02 if VSPI_HOST_SELECTED
-
-
 choice MIPI_PIXEL_FORMAT
     prompt "Pixel format"
     default MIPI_DCS_PIXEL_FORMAT_16BIT_SELECTED
@@ -142,6 +127,20 @@ config SPI_CLOCK_SPEED_HZ
     range 0 80000000
     help
         SPI clock speed in Hz. If you have problems try a lower value.
+
+choice
+    prompt "SPI HOST"
+    default HSPI_HOST_SELECTED
+    config HSPI_HOST_SELECTED
+        bool "HSPI_HOST"
+    config VSPI_HOST_SELECTED
+        bool "VSPI_HOST"
+endchoice
+
+config MIPI_DISPLAY_SPI_HOST
+    hex
+    default 0x01 if !VSPI_HOST_SELECTED
+    default 0x02 if VSPI_HOST_SELECTED
 
 config MIPI_DISPLAY_PIN_MISO
     int "MISO pin number"
