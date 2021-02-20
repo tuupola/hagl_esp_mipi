@@ -128,19 +128,40 @@ config MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ
     help
         SPI clock speed in Hz. If you have problems try a lower value.
 
+if IDF_TARGET_ESP32
 choice
     prompt "SPI HOST"
-    default HSPI_HOST_SELECTED
-    config HSPI_HOST_SELECTED
+    default ESP32_HSPI_HOST_SELECTED
+    config ESP32_HSPI_HOST_SELECTED
         bool "HSPI_HOST"
-    config VSPI_HOST_SELECTED
+    config ESP32_VSPI_HOST_SELECTED
         bool "VSPI_HOST"
 endchoice
 
 config MIPI_DISPLAY_SPI_HOST
     hex
-    default 0x01 if !VSPI_HOST_SELECTED
-    default 0x02 if VSPI_HOST_SELECTED
+    default 0x01 if ESP32_HSPI_HOST_SELECTED
+    default 0x02 if ESP32_VSPI_HOST_SELECTED
+
+endif
+
+if IDF_TARGET_ESP32S2
+choice
+    prompt "SPI HOST"
+    default ESP32S2_FSPI_HOST_SELECTED
+    config ESP32S2_FSPI_HOST_SELECTED
+        bool "FSPI_HOST"
+    config ESP32S2_HSPI_HOST_SELECTED
+        bool "HSPI_HOST"
+endchoice
+
+config MIPI_DISPLAY_SPI_HOST
+    hex
+    default 0x01 if ESP32S2_FSPI_HOST_SELECTED
+    default 0x02 if ESP32S2_HSPI_HOST_SELECTED
+
+endif
+
 
 config MIPI_DISPLAY_PIN_MISO
     int "MISO pin number"
