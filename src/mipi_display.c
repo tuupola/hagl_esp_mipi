@@ -177,7 +177,7 @@ void mipi_display_init(spi_device_handle_t *spi)
     mipi_display_write_data(*spi, (const uint8_t *)CONFIG_MIPI_DISPLAY_PIXEL_FORMAT, 1);
 
 #ifdef CONFIG_MIPI_DISPLAY_INVERT
-    mipi_display_write_command(*spi, MIPI_DISPLAY_INVERT_COMMAND);
+    mipi_display_write_command(*spi, MIPI_DCS_ENTER_INVERT_MODE);
 #else
     mipi_display_write_command(*spi, MIPI_DCS_EXIT_INVERT_MODE);
 #endif
