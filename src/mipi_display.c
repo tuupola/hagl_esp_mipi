@@ -171,10 +171,10 @@ void mipi_display_init(spi_device_handle_t *spi)
     vTaskDelay(200 / portTICK_RATE_MS);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_ADDRESS_MODE);
-    mipi_display_write_data(*spi, (const uint8_t *)MIPI_DISPLAY_ADDRESS_MODE, 1);
+    mipi_display_write_data(*spi, &(uint8_t){MIPI_DISPLAY_ADDRESS_MODE}, 1);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_PIXEL_FORMAT);
-    mipi_display_write_data(*spi, (const uint8_t *)CONFIG_MIPI_DISPLAY_PIXEL_FORMAT, 1);
+    mipi_display_write_data(*spi,  &(uint8_t){CONFIG_MIPI_DISPLAY_PIXEL_FORMAT}, 1);
 
 #ifdef CONFIG_MIPI_DISPLAY_INVERT
     mipi_display_write_command(*spi, MIPI_DCS_ENTER_INVERT_MODE);
