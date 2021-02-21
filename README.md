@@ -6,17 +6,7 @@ HAL for HAGL graphics library for display drivers supporting the [MIPI Display C
 
 ## Usage
 
-To use with an ESP-IDF project you include this HAL and the [HAGL graphics library](https://github.com/tuupola/hagl) itself.
-
-```
-$ cd components
-$ git submodule add git@github.com:tuupola/hagl_esp_mipi.git
-$ git submodule add git@github.com:tuupola/hagl.git
-```
-
-**NOTE!**
-
-If you are using CMake based build the HAL must be in folder named `hagl_hal`. To install use the following instead.
+To use with an ESP-IDF project you include this HAL and the [HAGL graphics library](https://github.com/tuupola/hagl) itself.  If you are using CMake based build the HAL **must** be in folder named `hagl_hal`.
 
 ```
 $ cd components
