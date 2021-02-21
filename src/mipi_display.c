@@ -54,6 +54,8 @@ SPDX-License-Identifier: MIT
 #include "mipi_display.h"
 
 static const char *TAG = "mipi_display";
+static const uint8_t EOC = 0xff;
+
 static SemaphoreHandle_t mutex;
 
 DRAM_ATTR static const mipi_init_command_t init_commands[] = {
@@ -68,7 +70,7 @@ DRAM_ATTR static const mipi_init_command_t init_commands[] = {
     {MIPI_DCS_EXIT_SLEEP_MODE, {0}, 0, 200},
     {MIPI_DCS_SET_DISPLAY_ON, {0}, 0, 200},
     /* End of commands . */
-    {0, {0}, 0xff, 0},
+    {0, {0}, EOC, 0},
 };
 
 static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
@@ -184,7 +186,7 @@ void mipi_display_init(spi_device_handle_t *spi)
     }
 
     /* Send all the commands. */
-    while (init_commands[cmd].count != 0xff) {
+    while (init_commands[cmd].count != EOC) {
         mipi_display_write_command(*spi, init_commands[cmd].command);
         mipi_display_write_data(*spi, init_commands[cmd].data, init_commands[cmd].count);
         vTaskDelay(init_commands[cmd].delay / portTICK_RATE_MS);
