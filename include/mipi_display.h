@@ -67,6 +67,7 @@ typedef struct {
     uint8_t command;
     uint8_t data[16];
     uint8_t count;
+    uint8_t delay;
 } mipi_init_command_t;
 
 void mipi_display_init(spi_device_handle_t *spi);
