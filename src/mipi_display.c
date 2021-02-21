@@ -54,24 +54,7 @@ SPDX-License-Identifier: MIT
 #include "mipi_display.h"
 
 static const char *TAG = "mipi_display";
-static const uint8_t EOC = 0xff;
-
 static SemaphoreHandle_t mutex;
-
-DRAM_ATTR static const mipi_init_command_t init_commands[] = {
-    {MIPI_DCS_SOFT_RESET, {0}, 0, 200},
-    {MIPI_DCS_SET_ADDRESS_MODE, {MIPI_DISPLAY_ADDRESS_MODE}, 1, 0},
-    {MIPI_DCS_SET_PIXEL_FORMAT, {CONFIG_MIPI_DISPLAY_PIXEL_FORMAT}, 1, 0},
-#ifdef CONFIG_MIPI_DISPLAY_INVERT
-    {MIPI_DCS_ENTER_INVERT_MODE, {0}, 0, 0},
-#else
-    {MIPI_DCS_EXIT_INVERT_MODE, {0}, 0, 0},
-#endif
-    {MIPI_DCS_EXIT_SLEEP_MODE, {0}, 0, 200},
-    {MIPI_DCS_SET_DISPLAY_ON, {0}, 0, 200},
-    /* End of commands . */
-    {0, {0}, EOC, 0},
-};
 
 static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
 {
@@ -164,7 +147,7 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
 
 void mipi_display_init(spi_device_handle_t *spi)
 {
-    uint8_t cmd = 0;
+    // uint8_t cmd = 0;
 
     mutex = xSemaphoreCreateMutex();
 
@@ -185,13 +168,27 @@ void mipi_display_init(spi_device_handle_t *spi)
         vTaskDelay(100 / portTICK_RATE_MS);
     }
 
-    /* Send all the commands. */
-    while (init_commands[cmd].count != EOC) {
-        mipi_display_write_command(*spi, init_commands[cmd].command);
-        mipi_display_write_data(*spi, init_commands[cmd].data, init_commands[cmd].count);
-        vTaskDelay(init_commands[cmd].delay / portTICK_RATE_MS);
-        cmd++;
-    }
+    /* Send minimal init commands. */
+    mipi_display_write_command(*spi, MIPI_DCS_SOFT_RESET);
+    vTaskDelay(200 / portTICK_RATE_MS);
+
+    mipi_display_write_command(*spi, MIPI_DCS_SET_ADDRESS_MODE);
+    mipi_display_write_data(*spi, (const uint8_t *)MIPI_DISPLAY_ADDRESS_MODE, 1);
+
+    mipi_display_write_command(*spi, MIPI_DCS_SET_PIXEL_FORMAT);
+    mipi_display_write_data(*spi, (const uint8_t *)CONFIG_MIPI_DISPLAY_PIXEL_FORMAT, 1);
+
+#ifdef CONFIG_MIPI_DISPLAY_INVERT
+    mipi_display_write_command(*spi, MIPI_DISPLAY_INVERT_COMMAND);
+#else
+    mipi_display_write_command(*spi, MIPI_DCS_EXIT_INVERT_MODE);
+#endif
+
+    mipi_display_write_command(*spi, MIPI_DCS_EXIT_SLEEP_MODE);
+    vTaskDelay(200 / portTICK_RATE_MS);
+
+    mipi_display_write_command(*spi, MIPI_DCS_SET_DISPLAY_ON);
+    vTaskDelay(200 / portTICK_RATE_MS);
 
     /* Enable backlight */
     if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
