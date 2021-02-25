@@ -61,17 +61,15 @@ static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t co
     spi_transaction_t transaction;
     memset(&transaction, 0, sizeof(transaction));
 
-    /* Command is 1 byte ie 8 bits */
+     /* Length in bits. */
     transaction.length = 1 * 8;
-    /* The data is the command itself */
     transaction.tx_buffer = &command;
-    /* DC needs to be set to 0. */
+    /* Set DC low to denote a command. */
     transaction.user = (void *) 0;
     ESP_LOGD(TAG, "Sending command 0x%02x", (uint8_t)command);
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
-/* Uses spi_device_transmit, which waits until the transfer is complete. */
 static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t length)
 {
     if (0 == length) {
@@ -81,10 +79,10 @@ static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data
     spi_transaction_t transaction;
     memset(&transaction, 0, sizeof(transaction));
 
-     /* Length in bits */
+     /* Length in bits. */
     transaction.length = length * 8;
     transaction.tx_buffer = data;
-     /* DC needs to be set to 1 */
+    /* Set DC high to denote data. */
     transaction.user = (void *) 1;
 
     ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_DEBUG);
@@ -105,14 +103,12 @@ static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_
     transaction.rxlength = length * 8;
     transaction.rx_buffer = data;
     //transaction.flags = SPI_TRANS_USE_RXDATA;
-     /* DC needs to be set to 1 */
+    /* Set DC high to denote data. */
     transaction.user = (void *) 1;
 
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
-/* This function is called in irq context just before a transmission starts. */
-/* It will set the DC line to the value indicated in the user field. */
 static void mipi_display_pre_callback(spi_transaction_t *transaction)
 {
     uint32_t dc = (uint32_t) transaction->user;
@@ -127,7 +123,7 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .sclk_io_num = CONFIG_MIPI_DISPLAY_PIN_CLK,
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
-        /* Max transfer size in bytes */
+        /* Max transfer size in bytes. */
         .max_transfer_sz = SPI_MAX_TRANSFER_SIZE
     };
     spi_device_interface_config_t devcfg = {
@@ -135,7 +131,6 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .mode = 0,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
         .queue_size = 64,
-        /* Handles the D/C line */
         .pre_cb = mipi_display_pre_callback,
         .flags = SPI_DEVICE_NO_DUMMY
     };
@@ -153,7 +148,6 @@ void mipi_display_init(spi_device_handle_t *spi)
 	gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
 
-    /* Init spi driver. */
     mipi_display_spi_master_init(spi);
     vTaskDelay(100 / portTICK_RATE_MS);
 
@@ -188,12 +182,12 @@ void mipi_display_init(spi_device_handle_t *spi)
     mipi_display_write_command(*spi, MIPI_DCS_SET_DISPLAY_ON);
     vTaskDelay(200 / portTICK_RATE_MS);
 
-    /* Enable backlight */
+    /* Enable backlight. */
     if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 1);
 
-        /* Enable backlight PWM */
+        /* Enable backlight PWM. */
         if (CONFIG_MIPI_DISPLAY_PWM_BL > 0) {
             ESP_LOGI(TAG, "Initializing backlight PWM");
             ledc_timer_config_t timercfg = {
@@ -247,11 +241,13 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
 
     memset(&command, 0, sizeof(spi_transaction_t));
     command.length = 8;
+    /* Set DC low to denote a command. */
     command.user = (void *) 0;
     command.flags = SPI_TRANS_USE_TXDATA;
 
     memset(&data, 0, sizeof(spi_transaction_t));
     data.length = 8 * 4;
+    /* Set DC high to denote data. */
     data.user = (void *) 1;
     data.flags = SPI_TRANS_USE_TXDATA;
 
