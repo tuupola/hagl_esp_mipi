@@ -165,4 +165,17 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
     }
 }
 
+void hagl_hal_clear_screen()
+{
+    color_t *ptr1 = (color_t *) buffer1;
+    color_t *ptr2 = (color_t *) buffer2;
+    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+    while (--count) {
+        *ptr1++ = 0x0000;
+        *ptr2++ = 0x0000;
+    }
+}
+
+
 #endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */

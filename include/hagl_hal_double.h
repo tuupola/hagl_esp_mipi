@@ -60,6 +60,7 @@ extern "C" {
 #define HAGL_HAS_HAL_HLINE
 #define HAGL_HAS_HAL_VLINE
 #define HAGL_HAS_HAL_FLUSH
+#define HAGL_HAS_HAL_CLEAR_SCREEN
 
 /**
  * Put a pixel
@@ -119,6 +120,11 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t h, color_t color);
  * Flush back buffer to the display
  */
 void hagl_hal_flush();
+
+/**
+ * Clear the display
+ */
+void hagl_hal_clear_screen();
 
 #ifdef __cplusplus
 }

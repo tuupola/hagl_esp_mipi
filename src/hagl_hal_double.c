@@ -176,5 +176,22 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
+void hagl_hal_clear_screen()
+{
+    ESP_LOGI(TAG, "hagl_hal_clear_screen()");
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    color_t *ptr = (color_t *) buffer1;
+    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+    while (--count) {
+        *ptr++ = 0x0000;
+    }
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
 
