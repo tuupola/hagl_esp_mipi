@@ -178,7 +178,6 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
 
 void hagl_hal_clear_screen()
 {
-    ESP_LOGI(TAG, "hagl_hal_clear_screen()");
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
