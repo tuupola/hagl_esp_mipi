@@ -144,8 +144,11 @@ void mipi_display_init(spi_device_handle_t *spi)
 {
     mutex = xSemaphoreCreateMutex();
 
-	gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
-	gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
+    if (CONFIG_MIPI_DISPLAY_PIN_CS > 0) {
+        gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
+        gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
+    };
+
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
 
     mipi_display_spi_master_init(spi);
