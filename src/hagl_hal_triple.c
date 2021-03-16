@@ -121,7 +121,7 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-void hagl_hal_flush()
+size_t hagl_hal_flush()
 {
     uint8_t *buffer = fb.buffer;
     if (fb.buffer == buffer1) {
@@ -129,7 +129,7 @@ void hagl_hal_flush()
     } else {
         fb.buffer = buffer1;
     }
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
+    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
 }
 
 void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)

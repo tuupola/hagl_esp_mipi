@@ -222,7 +222,7 @@ void mipi_display_init(spi_device_handle_t *spi)
     spi_device_acquire_bus(*spi, portMAX_DELAY);
 }
 
-void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
+size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
 {
     if (0 == w || 0 == h) {
         return;
@@ -233,7 +233,7 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
 
     int32_t x2 = x1 + w - 1;
     int32_t y2 = y1 + h - 1;
-    uint32_t size = w * h;
+    size_t size = w * h;
 
     static int32_t prev_x1, prev_x2, prev_y1, prev_y2;
 
@@ -301,6 +301,8 @@ void mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint1
     }
 
     xSemaphoreGive(mutex);
+
+    return size * DISPLAY_DEPTH / 8;
 }
 
 void mipi_display_ioctl(spi_device_handle_t spi, const uint8_t command, uint8_t *data, size_t size)

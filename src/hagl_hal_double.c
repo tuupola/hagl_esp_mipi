@@ -100,16 +100,18 @@ bitmap_t *hagl_hal_init(void)
     return &fb;
 }
 
-void hagl_hal_flush()
+size_t hagl_hal_flush()
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    size_t size = 0;
     /* Flush the whole back buffer with locking. */
     xSemaphoreTake(mutex, portMAX_DELAY);
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    size = mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
     xSemaphoreGive(mutex);
+    return size;
 #else
     /* Flush the whole back buffer. */
-    mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
+    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
