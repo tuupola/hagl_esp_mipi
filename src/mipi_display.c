@@ -109,6 +109,65 @@ static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
+
+static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+    uint8_t data[4];
+    static uint16_t prev_x1, prev_x2, prev_y1, prev_y2;
+
+    x1 = x1 + CONFIG_MIPI_DISPLAY_OFFSET_X;
+    y1 = y1 + CONFIG_MIPI_DISPLAY_OFFSET_Y;
+    x2 = x2 + CONFIG_MIPI_DISPLAY_OFFSET_X;
+    y2 = y2 + CONFIG_MIPI_DISPLAY_OFFSET_Y;
+
+    /* Change column address only if it has changed. */
+    if ((prev_x1 != x1 || prev_x2 != x2)) {
+        mipi_display_write_command(spi, MIPI_DCS_SET_COLUMN_ADDRESS);
+        data[0] = x1 >> 8;
+        data[1] = x1 & 0xff;
+        data[2] = x2 >> 8;
+        data[3] = x2 & 0xff;
+        mipi_display_write_data(spi, data, 4);
+
+        prev_x1 = x1;
+        prev_x2 = x2;
+    }
+
+    /* Change page address only if it has changed. */
+    if ((prev_y1 != y1 || prev_y2 != y2)) {
+        mipi_display_write_command(spi, MIPI_DCS_SET_PAGE_ADDRESS);
+        data[0] = y1 >> 8;
+        data[1] = y1 & 0xff;
+        data[2] = y2 >> 8;
+        data[3] = y2 & 0xff;
+        mipi_display_write_data(spi, data, 4);
+
+        prev_y1 = y1;
+        prev_y2 = y2;
+    }
+
+    mipi_display_write_command(spi, MIPI_DCS_WRITE_MEMORY_START);
+}
+
+size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
+{
+    if (0 == w || 0 == h) {
+        return 0;
+    }
+
+    const int32_t x2 = x1 + w - 1;
+    const int32_t y2 = y1 + h - 1;
+    const size_t size = w * h * DISPLAY_DEPTH / 8;
+
+    xSemaphoreTake(mutex, portMAX_DELAY);
+
+    mipi_display_set_address(spi, x1, y1, x2, y2);
+    mipi_display_write_data(spi, buffer, size);
+
+    xSemaphoreGive(mutex);
+
+    return size;
+}
+
 static void mipi_display_pre_callback(spi_transaction_t *transaction)
 {
     uint32_t dc = (uint32_t) transaction->user;
@@ -220,95 +279,6 @@ void mipi_display_init(spi_device_handle_t *spi)
     ESP_LOGI(TAG, "Display initialized.");
 
     spi_device_acquire_bus(*spi, portMAX_DELAY);
-}
-
-static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
-    uint8_t data[4];
-    static uint16_t prev_x1, prev_x2, prev_y1, prev_y2;
-
-    x1 = x1 + CONFIG_MIPI_DISPLAY_OFFSET_X;
-    y1 = y1 + CONFIG_MIPI_DISPLAY_OFFSET_Y;
-    x2 = x2 + CONFIG_MIPI_DISPLAY_OFFSET_X;
-    y2 = y2 + CONFIG_MIPI_DISPLAY_OFFSET_Y;
-
-    xSemaphoreTake(mutex, portMAX_DELAY);
-
-    /* Change column address only if it has changed. */
-    if ((prev_x1 != x1 || prev_x2 != x2)) {
-        mipi_display_write_command(spi, MIPI_DCS_SET_COLUMN_ADDRESS);
-        data[0] = x1 >> 8;
-        data[1] = x1 & 0xff;
-        data[2] = x2 >> 8;
-        data[3] = x2 & 0xff;
-        mipi_display_write_data(spi, data, 4);
-
-        prev_x1 = x1;
-        prev_x2 = x2;
-    }
-
-    /* Change page address only if it has changed. */
-    if ((prev_y1 != y1 || prev_y2 != y2)) {
-        mipi_display_write_command(spi, MIPI_DCS_SET_PAGE_ADDRESS);
-        data[0] = y1 >> 8;
-        data[1] = y1 & 0xff;
-        data[2] = y2 >> 8;
-        data[3] = y2 & 0xff;
-        mipi_display_write_data(spi, data, 4);
-
-        prev_y1 = y1;
-        prev_y2 = y2;
-    }
-
-    mipi_display_write_command(spi, MIPI_DCS_WRITE_MEMORY_START);
-
-    xSemaphoreGive(mutex);
-}
-
-size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
-{
-    if (0 == w || 0 == h) {
-        return 0;
-    }
-
-    int32_t x2 = x1 + w - 1;
-    int32_t y2 = y1 + h - 1;
-    size_t size = w * h;
-
-    spi_transaction_t command;
-    spi_transaction_t data;
-
-    memset(&command, 0, sizeof(spi_transaction_t));
-    command.length = 8;
-    /* Set DC low to denote a command. */
-    command.user = (void *) 0;
-    command.flags = SPI_TRANS_USE_TXDATA;
-
-    memset(&data, 0, sizeof(spi_transaction_t));
-    data.length = 8 * 4;
-    /* Set DC high to denote data. */
-    data.user = (void *) 1;
-    data.flags = SPI_TRANS_USE_TXDATA;
-
-    mipi_display_set_address(spi, x1, y1, x2, y2);
-
-    xSemaphoreTake(mutex, portMAX_DELAY);
-
-    data.rxlength = 0;
-    data.tx_buffer = buffer;
-    /* Transfer size in bits */
-    data.length = size * DISPLAY_DEPTH;
-    /* Clear SPI_TRANS_USE_TXDATA flag */
-    data.flags = 0;
-
-    if (data.length > SPI_MAX_TRANSFER_SIZE / 2) {
-        ESP_ERROR_CHECK(spi_device_transmit(spi, &data));
-    } else {
-        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &data));
-    }
-
-    xSemaphoreGive(mutex);
-
-    return size * DISPLAY_DEPTH / 8;
 }
 
 void mipi_display_ioctl(spi_device_handle_t spi, const uint8_t command, uint8_t *data, size_t size)
