@@ -225,7 +225,7 @@ void mipi_display_init(spi_device_handle_t *spi)
 size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
 {
     if (0 == w || 0 == h) {
-        return;
+        return 0;
     }
 
     x1 = x1 + CONFIG_MIPI_DISPLAY_OFFSET_X;
