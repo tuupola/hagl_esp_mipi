@@ -293,9 +293,6 @@ size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uin
 
     xSemaphoreTake(mutex, portMAX_DELAY);
 
-    command.tx_data[0] = MIPI_DCS_WRITE_MEMORY_START;
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &command));
-
     data.rxlength = 0;
     data.tx_buffer = buffer;
     /* Transfer size in bits */
