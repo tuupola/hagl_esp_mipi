@@ -119,8 +119,6 @@ static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint1
     x2 = x2 + CONFIG_MIPI_DISPLAY_OFFSET_X;
     y2 = y2 + CONFIG_MIPI_DISPLAY_OFFSET_Y;
 
-    xSemaphoreTake(mutex, portMAX_DELAY);
-
     /* Change column address only if it has changed. */
     if ((prev_x1 != x1 || prev_x2 != x2)) {
         mipi_display_write_command(spi, MIPI_DCS_SET_COLUMN_ADDRESS);
@@ -148,8 +146,6 @@ static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint1
     }
 
     mipi_display_write_command(spi, MIPI_DCS_WRITE_MEMORY_START);
-
-    xSemaphoreGive(mutex);
 }
 
 size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
@@ -162,8 +158,12 @@ size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uin
     const int32_t y2 = y1 + h - 1;
     const size_t size = w * h * DISPLAY_DEPTH / 8;
 
+    xSemaphoreTake(mutex, portMAX_DELAY);
+
     mipi_display_set_address(spi, x1, y1, x2, y2);
     mipi_display_write_data(spi, buffer, size);
+
+    xSemaphoreGive(mutex);
 
     return size;
 }
