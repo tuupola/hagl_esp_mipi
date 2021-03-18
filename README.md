@@ -17,6 +17,12 @@ $ git submodule add git@github.com:tuupola/hagl.git
 You can alter display behaviour via `menuconfig`. If you choose to use back buffer all drawing operations will be fast. Downside is that back buffer requires lot of memory. To reduce flickering you can also choose to lock back buffer while flushing. Locking will slow down draw operations though.
 
 ```
+$ idf.py menuconfig
+```
+
+You can also use the older GNU Make based build system.
+
+```
 $ make menuconfig
 ```
 
@@ -24,7 +30,7 @@ $ make menuconfig
 
 ```
 $ cp components/hagl_hal/sdkconfig/m5stack.defaults sdkconfig.defaults
-$ make menuconfig
+$ idf.py menuconfig
 ```
 
 For example usage see [ESP GFX](https://github.com/tuupola/esp_gfx), [ESP effects](https://github.com/tuupola/esp_effects) and [Mandelbrot](https://github.com/tuupola/esp-examples/tree/master/014-mandelbrot).
