@@ -64,9 +64,11 @@ static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t co
      /* Length in bits. */
     transaction.length = 1 * 8;
     transaction.tx_buffer = &command;
-    /* Set DC low to denote a command. */
-    transaction.user = (void *) 0;
+
     ESP_LOGD(TAG, "Sending command 0x%02x", (uint8_t)command);
+
+    /* Set DC low to denote a command. */
+    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 0);
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
@@ -82,11 +84,12 @@ static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data
      /* Length in bits. */
     transaction.length = length * 8;
     transaction.tx_buffer = data;
-    /* Set DC high to denote data. */
-    transaction.user = (void *) 1;
 
-    ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_DEBUG);
+    /* Set DC high to denote data. */
+    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
+
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
+    ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_DEBUG);
 }
 
 static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
@@ -103,8 +106,9 @@ static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_
     transaction.rxlength = length * 8;
     transaction.rx_buffer = data;
     //transaction.flags = SPI_TRANS_USE_RXDATA;
+
     /* Set DC high to denote data. */
-    transaction.user = (void *) 1;
+    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
 
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
@@ -168,12 +172,6 @@ size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uin
     return size;
 }
 
-static void mipi_display_pre_callback(spi_transaction_t *transaction)
-{
-    uint32_t dc = (uint32_t) transaction->user;
-    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, dc);
-}
-
 static void mipi_display_spi_master_init(spi_device_handle_t *spi)
 {
     spi_bus_config_t buscfg = {
@@ -190,7 +188,6 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .mode = CONFIG_MIPI_DISPLAY_SPI_MODE,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
         .queue_size = 64,
-        .pre_cb = mipi_display_pre_callback,
         .flags = SPI_DEVICE_NO_DUMMY
     };
 
