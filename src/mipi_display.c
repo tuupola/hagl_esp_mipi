@@ -201,10 +201,12 @@ void mipi_display_init(spi_device_handle_t *spi)
     mutex = xSemaphoreCreateMutex();
 
     if (CONFIG_MIPI_DISPLAY_PIN_CS > 0) {
+        gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
     };
 
+    gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
 
     mipi_display_spi_master_init(spi);
@@ -212,6 +214,7 @@ void mipi_display_init(spi_device_handle_t *spi)
 
     /* Reset the display. */
     if (CONFIG_MIPI_DISPLAY_PIN_RST > 0) {
+        gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_RST);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_RST, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 0);
         vTaskDelay(100 / portTICK_RATE_MS);
