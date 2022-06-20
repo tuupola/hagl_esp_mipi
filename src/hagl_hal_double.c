@@ -57,18 +57,113 @@ valid.
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
 static SemaphoreHandle_t mutex;
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-static uint8_t *buffer1;
+// static uint8_t *buffer;
 
-static bitmap_t fb = {
-    .width = DISPLAY_WIDTH,
-    .height = DISPLAY_HEIGHT,
-    .depth = DISPLAY_DEPTH,
-};
+static bitmap_t bb;
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-bitmap_t *hagl_hal_init(void)
+static size_t
+flush(void *self)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    size_t size = 0;
+    /* Flush the whole back buffer with locking. */
+    xSemaphoreTake(mutex, portMAX_DELAY);
+    size = mipi_display_write(spi, 0, 0, bb.width, bb.height, (uint8_t *) bb.buffer);
+    xSemaphoreGive(mutex);
+    return size;
+#else
+    /* Flush the whole back buffer. */
+    return mipi_display_write(spi, 0, 0, bb.width, bb.height, (uint8_t *) bb.buffer);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+static void
+put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    bb.put_pixel(&bb, x0, y0, color);
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+static color_t
+get_pixel(void *self, int16_t x0, int16_t y0)
+{
+    return bb.get_pixel(&bb, x0, y0);
+}
+
+static void
+blit(void *self, int16_t x0, int16_t y0, bitmap_t *src)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    bb.blit(&bb, x0, y0, src);
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+static void
+scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    bb.scale_blit(&bb, x0, y0, w, h, src);
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+static void
+hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    bb.hline(&bb, x0, y0, width, color);
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+static void
+vline(void *self, int16_t x0, int16_t y0, uint16_t height, color_t color)
+{
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreTake(mutex, portMAX_DELAY);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    bb.vline(&bb, x0, y0, height, color);
+#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+    xSemaphoreGive(mutex);
+#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+}
+
+// void hagl_hal_clear_screen()
+// {
+// #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+//     xSemaphoreTake(mutex, portMAX_DELAY);
+// #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+//     color_t *ptr = (color_t *) buffer;
+//     size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+//     while (--count) {
+//         *ptr++ = 0x0000;
+//     }
+// #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
+//     xSemaphoreGive(mutex);
+// #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+// }
+
+void
+hagl_hal_init(hagl_backend_t *backend)
 {
     mipi_display_init(&spi);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
@@ -80,12 +175,12 @@ bitmap_t *hagl_hal_init(void)
         heap_caps_get_largest_free_block(MALLOC_CAP_DMA | MALLOC_CAP_32BIT)
     );
 
-    buffer1 = (uint8_t *) heap_caps_malloc(
+    backend->buffer = (uint8_t *) heap_caps_malloc(
         BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
         MALLOC_CAP_DMA
     );
-    if (NULL == buffer1) {
-        ESP_LOGE(TAG, "NO BUFFER 1");
+    if (NULL == backend->buffer) {
+        ESP_LOGE(TAG, "NO BUFFER");
     };
 
     ESP_LOGI(
@@ -95,104 +190,24 @@ bitmap_t *hagl_hal_init(void)
 
     heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    bitmap_init(&fb, buffer1);
+    memset(&bb, 0, sizeof(bitmap_t));
+    bb.width = DISPLAY_WIDTH;
+    bb.height = DISPLAY_HEIGHT;
+    bb.depth = DISPLAY_DEPTH;
 
-    return &fb;
-}
+    bitmap_init(&bb, backend->buffer);
 
-size_t hagl_hal_flush()
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    size_t size = 0;
-    /* Flush the whole back buffer with locking. */
-    xSemaphoreTake(mutex, portMAX_DELAY);
-    size = mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-    xSemaphoreGive(mutex);
-    return size;
-#else
-    /* Flush the whole back buffer. */
-    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) fb.buffer);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
+    backend->width = MIPI_DISPLAY_WIDTH;
+    backend->height = MIPI_DISPLAY_HEIGHT;
+    backend->depth = MIPI_DISPLAY_DEPTH;
+    backend->put_pixel = put_pixel;
+    backend->get_pixel = get_pixel;
+    backend->hline = hline;
+    backend->vline = vline;
+    backend->blit = blit;
+    backend->scale_blit = scale_blit;
 
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    *ptr = color;
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
-
-void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bitmap_blit(x0, y0, src, &fb);
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
-
-void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bitmap_scale_blit(x0, y0, w, h, src, &fb);
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
-
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t x = 0; x < width; x++) {
-        *ptr++ = color;
-    }
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
-
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t y = 0; y < height; y++) {
-        *ptr = color;
-        ptr += fb.pitch / (fb.depth / 8);
-    }
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-}
-
-void hagl_hal_clear_screen()
-{
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreTake(mutex, portMAX_DELAY);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    color_t *ptr = (color_t *) buffer1;
-    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
-
-    while (--count) {
-        *ptr++ = 0x0000;
-    }
-#ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
-    xSemaphoreGive(mutex);
-#endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
+    backend->flush = flush;
 }
 
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
-
