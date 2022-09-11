@@ -149,6 +149,7 @@ hagl_hal_init(hagl_backend_t *backend)
         ESP_LOGE(TAG, "Failed to alloc buffer 1.");
     } else {
         ESP_LOGI(TAG, "Buffer 1 at: %p", buffer1);
+        memset(buffer1, 0x00, BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH));
     };
 
     ESP_LOGI(
@@ -170,6 +171,7 @@ hagl_hal_init(hagl_backend_t *backend)
         ESP_LOGE(TAG, "Failed to alloc buffer 2.");
     } else {
         ESP_LOGI(TAG, "Buffer 2 at: %p", buffer2);
+        memset(buffer2, 0x00, BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH));
     };
 
     /* Clear both and leave pointer to buffer1. */
