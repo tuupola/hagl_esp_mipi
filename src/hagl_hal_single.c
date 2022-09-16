@@ -51,30 +51,27 @@ valid.
 #include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
-#include <bitmap.h>
+#include <hagl/bitmap.h>
 #include <hagl.h>
 
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-bitmap_t *hagl_hal_init(void)
-{
-    mipi_display_init(&spi);
-    return NULL;
-}
-
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
+static void
+put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
 {
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 }
 
-void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
+static void
+blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
 {
     mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
 }
 
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
+static void
+hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
 {
     static color_t line[DISPLAY_WIDTH];
     color_t *ptr = line;
@@ -87,7 +84,8 @@ void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 }
 
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
+static void
+vline(void *self, int16_t x0, int16_t y0, uint16_t height, color_t color)
 {
     static color_t line[DISPLAY_HEIGHT];
     color_t *ptr = line;
@@ -100,4 +98,18 @@ void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
     mipi_display_write(spi, x0, y0, width, height, (uint8_t *) line);
 }
 
+void
+hagl_hal_init(hagl_backend_t *backend)
+{
+    mipi_display_init(&spi);
+
+    backend->width = MIPI_DISPLAY_WIDTH;
+    backend->height = MIPI_DISPLAY_HEIGHT;
+    backend->depth = MIPI_DISPLAY_DEPTH;
+    backend->put_pixel = put_pixel;
+    // backend->get_pixel = get_pixel;
+    backend->hline = hline;
+    backend->vline = vline;
+    backend->blit = blit;
+}
 #endif /* CONFIG_HAGL_HAL_NO_BUFFERING */

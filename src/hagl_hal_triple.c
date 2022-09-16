@@ -52,23 +52,81 @@ valid.
 #include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
-#include <bitmap.h>
+#include <hagl/bitmap.h>
 #include <hagl.h>
 
 
 static uint8_t *buffer1;
 static uint8_t *buffer2;
 
-static bitmap_t fb = {
-    .width = DISPLAY_WIDTH,
-    .height = DISPLAY_HEIGHT,
-    .depth = DISPLAY_DEPTH,
-};
+static hagl_bitmap_t bb;
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
-bitmap_t *hagl_hal_init(void)
+static size_t
+flush(void *self)
+{
+    uint8_t *buffer = bb.buffer;
+    if (bb.buffer == buffer1) {
+        bb.buffer = buffer2;
+    } else {
+        bb.buffer = buffer1;
+    }
+    return mipi_display_write(spi, 0, 0, bb.width, bb.height, (uint8_t *) buffer);
+}
+
+static void
+put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
+{
+    bb.put_pixel(&bb, x0, y0, color);
+}
+
+static color_t
+get_pixel(void *self, int16_t x0, int16_t y0)
+{
+    return bb.get_pixel(&bb, x0, y0);
+}
+
+static void
+blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
+{
+    bb.blit(&bb, x0, y0, src);
+}
+
+static void
+scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t *src)
+{
+    bb.scale_blit(&bb, x0, y0, w, h, src);
+}
+
+static void
+hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
+{
+    bb.hline(&bb, x0, y0, width, color);
+}
+
+
+static void
+vline(void *self, int16_t x0, int16_t y0, uint16_t height, color_t color)
+{
+    bb.vline(&bb, x0, y0, height, color);
+}
+
+// void hagl_hal_clear_screen()
+// {
+//     color_t *ptr1 = (color_t *) buffer1;
+//     color_t *ptr2 = (color_t *) buffer2;
+//     size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
+
+//     while (--count) {
+//         *ptr1++ = 0x0000;
+//         *ptr2++ = 0x0000;
+//     }
+// }
+
+void
+hagl_hal_init(hagl_backend_t *backend)
 {
     mipi_display_init(&spi);
 
@@ -91,6 +149,7 @@ bitmap_t *hagl_hal_init(void)
         ESP_LOGE(TAG, "Failed to alloc buffer 1.");
     } else {
         ESP_LOGI(TAG, "Buffer 1 at: %p", buffer1);
+        memset(buffer1, 0x00, BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH));
     };
 
     ESP_LOGI(
@@ -112,70 +171,32 @@ bitmap_t *hagl_hal_init(void)
         ESP_LOGE(TAG, "Failed to alloc buffer 2.");
     } else {
         ESP_LOGI(TAG, "Buffer 2 at: %p", buffer2);
+        memset(buffer2, 0x00, BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH));
     };
 
     /* Clear both and leave pointer to buffer1. */
-    bitmap_init(&fb, buffer2);
-    bitmap_init(&fb, buffer1);
+    memset(&bb, 0, sizeof(hagl_bitmap_t));
+    bb.width = DISPLAY_WIDTH;
+    bb.height = DISPLAY_HEIGHT;
+    bb.depth = DISPLAY_DEPTH;
 
-    return &fb;
+    bitmap_init(&bb, buffer2);
+    bitmap_init(&bb, buffer1);
+    backend->buffer = buffer1;
+
+    backend->width = MIPI_DISPLAY_WIDTH;
+    backend->height = MIPI_DISPLAY_HEIGHT;
+    backend->depth = MIPI_DISPLAY_DEPTH;
+    backend->put_pixel = put_pixel;
+    backend->get_pixel = get_pixel;
+    backend->hline = hline;
+    backend->vline = vline;
+    backend->blit = blit;
+    backend->scale_blit = scale_blit;
+
+    backend->flush = flush;
 }
 
-size_t hagl_hal_flush()
-{
-    uint8_t *buffer = fb.buffer;
-    if (fb.buffer == buffer1) {
-        fb.buffer = buffer2;
-    } else {
-        fb.buffer = buffer1;
-    }
-    return mipi_display_write(spi, 0, 0, fb.width, fb.height, (uint8_t *) buffer);
-}
-
-void hagl_hal_put_pixel(int16_t x0, int16_t y0, color_t color)
-{
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    *ptr = color;
-}
-
-void hagl_hal_blit(uint16_t x0, uint16_t y0, bitmap_t *src)
-{
-    bitmap_blit(x0, y0, src, &fb);
-}
-
-void hagl_hal_scale_blit(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
-{
-    bitmap_scale_blit(x0, y0, w, h, src, &fb);
-}
-
-void hagl_hal_hline(int16_t x0, int16_t y0, uint16_t width, color_t color)
-{
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t x = 0; x < width; x++) {
-        *ptr++ = color;
-    }
-}
-
-void hagl_hal_vline(int16_t x0, int16_t y0, uint16_t height, color_t color)
-{
-    color_t *ptr = (color_t *) (fb.buffer + fb.pitch * y0 + (fb.depth / 8) * x0);
-    for (uint16_t y = 0; y < height; y++) {
-        *ptr = color;
-        ptr += fb.pitch / (fb.depth / 8);
-    }
-}
-
-void hagl_hal_clear_screen()
-{
-    color_t *ptr1 = (color_t *) buffer1;
-    color_t *ptr2 = (color_t *) buffer2;
-    size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
-
-    while (--count) {
-        *ptr1++ = 0x0000;
-        *ptr2++ = 0x0000;
-    }
-}
 
 
 #endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */

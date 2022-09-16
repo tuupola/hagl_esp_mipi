@@ -39,6 +39,8 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <hagl/backend.h>
+
 #include "sdkconfig.h"
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_24BIT_SELECTED
@@ -66,21 +68,30 @@ typedef uint8_t color_t;
 typedef uint8_t color_t;
 #endif
 
-#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
-#include "hagl_hal_single.h"
-#endif
 
 #ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
-#include "hagl_hal_double.h"
+#define HAGL_HAS_HAL_BACK_BUFFER
 #endif
 
 #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING
-#include "hagl_hal_triple.h"
+#define HAGL_HAS_HAL_BACK_BUFFER
+#endif
+
+#ifdef CONFIG_HAGL_HAL_NO_BUFFERING
+#undef HAGL_HAS_HAL_BACK_BUFFER
 #endif
 
 #define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
 #define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
 #define DISPLAY_DEPTH       (CONFIG_MIPI_DISPLAY_DEPTH)
+#define MIPI_DISPLAY_WIDTH  (CONFIG_MIPI_DISPLAY_WIDTH)
+#define MIPI_DISPLAY_HEIGHT (CONFIG_MIPI_DISPLAY_HEIGHT)
+#define MIPI_DISPLAY_DEPTH  (CONFIG_MIPI_DISPLAY_DEPTH)
+
+/**
+ * Initialize the HAL
+ */
+void hagl_hal_init(hagl_backend_t *backend);
 
 #ifdef __cplusplus
 }
