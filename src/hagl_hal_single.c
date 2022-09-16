@@ -51,7 +51,7 @@ valid.
 #include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
-#include <bitmap.h>
+#include <hagl/bitmap.h>
 #include <hagl.h>
 
 
@@ -65,7 +65,7 @@ put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, bitmap_t *src)
+blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
 {
     mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
 }

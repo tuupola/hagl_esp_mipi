@@ -52,14 +52,14 @@ valid.
 #include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
-#include <bitmap.h>
+#include <hagl/bitmap.h>
 #include <hagl.h>
 
 
 static uint8_t *buffer1;
 static uint8_t *buffer2;
 
-static bitmap_t bb;
+static hagl_bitmap_t bb;
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
@@ -89,13 +89,13 @@ get_pixel(void *self, int16_t x0, int16_t y0)
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, bitmap_t *src)
+blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
 {
     bb.blit(&bb, x0, y0, src);
 }
 
 static void
-scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
+scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t *src)
 {
     bb.scale_blit(&bb, x0, y0, w, h, src);
 }
@@ -175,7 +175,7 @@ hagl_hal_init(hagl_backend_t *backend)
     };
 
     /* Clear both and leave pointer to buffer1. */
-    memset(&bb, 0, sizeof(bitmap_t));
+    memset(&bb, 0, sizeof(hagl_bitmap_t));
     bb.width = DISPLAY_WIDTH;
     bb.height = DISPLAY_HEIGHT;
     bb.depth = DISPLAY_DEPTH;

@@ -48,7 +48,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <backend.h>
+#include <hagl/backend.h>
 
 #include "hagl_hal.h"
 

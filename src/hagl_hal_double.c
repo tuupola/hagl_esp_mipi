@@ -50,7 +50,7 @@ valid.
 #include <esp_heap_caps.h>
 #include <string.h>
 #include <mipi_display.h>
-#include <bitmap.h>
+#include <hagl/bitmap.h>
 #include <hagl.h>
 
 #ifdef CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING
@@ -59,7 +59,7 @@ static SemaphoreHandle_t mutex;
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 // static uint8_t *buffer;
 
-static bitmap_t bb;
+static hagl_bitmap_t bb;
 
 static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
@@ -99,7 +99,7 @@ get_pixel(void *self, int16_t x0, int16_t y0)
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, bitmap_t *src)
+blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
@@ -111,7 +111,7 @@ blit(void *self, int16_t x0, int16_t y0, bitmap_t *src)
 }
 
 static void
-scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, bitmap_t *src)
+scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
@@ -190,7 +190,7 @@ hagl_hal_init(hagl_backend_t *backend)
 
     heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    memset(&bb, 0, sizeof(bitmap_t));
+    memset(&bb, 0, sizeof(hagl_bitmap_t));
     bb.width = DISPLAY_WIDTH;
     bb.height = DISPLAY_HEIGHT;
     bb.depth = DISPLAY_DEPTH;

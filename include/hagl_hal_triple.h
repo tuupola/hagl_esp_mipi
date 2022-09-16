@@ -50,8 +50,8 @@ extern "C" {
 
 #include <stdint.h>
 #include <stddef.h>
-#include <bitmap.h>
-#include <backend.h>
+#include <hagl/bitmap.h>
+#include <hagl/backend.h>
 
 #include "hagl_hal.h"
 
