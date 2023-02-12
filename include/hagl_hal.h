@@ -44,28 +44,28 @@ extern "C" {
 #include "sdkconfig.h"
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_24BIT_SELECTED
-typedef uint32_t color_t;
+typedef uint32_t hagl_color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_18BIT_SELECTED
-typedef uint32_t color_t;
+typedef uint32_t hagl_color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_16BIT_SELECTED
 /* Currently only this, ie. RGB565 is properly tested. */
-typedef uint16_t color_t;
+typedef uint16_t hagl_color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_12BIT_SELECTED
-typedef uint16_t color_t;
+typedef uint16_t hagl_color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_8BIT_SELECTED
-typedef uint8_t color_t;
+typedef uint8_t hagl_color_t;
 #endif
 
 #ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_3BIT_SELECTED
-typedef uint8_t color_t;
+typedef uint8_t hagl_color_t;
 #endif
 
 

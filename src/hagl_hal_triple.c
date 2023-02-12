@@ -77,12 +77,12 @@ flush(void *self)
 }
 
 static void
-put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
+put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
 {
     bb.put_pixel(&bb, x0, y0, color);
 }
 
-static color_t
+static hagl_color_t
 get_pixel(void *self, int16_t x0, int16_t y0)
 {
     return bb.get_pixel(&bb, x0, y0);
@@ -101,22 +101,22 @@ scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bi
 }
 
 static void
-hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
+hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
     bb.hline(&bb, x0, y0, width, color);
 }
 
 
 static void
-vline(void *self, int16_t x0, int16_t y0, uint16_t height, color_t color)
+vline(void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
     bb.vline(&bb, x0, y0, height, color);
 }
 
 // void hagl_hal_clear_screen()
 // {
-//     color_t *ptr1 = (color_t *) buffer1;
-//     color_t *ptr2 = (color_t *) buffer2;
+//     hagl_color_t *ptr1 = (hagl_color_t *) buffer1;
+//     hagl_color_t *ptr2 = (hagl_color_t *) buffer2;
 //     size_t count = DISPLAY_WIDTH * DISPLAY_HEIGHT;
 
 //     while (--count) {
