@@ -59,7 +59,7 @@ static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
 static void
-put_pixel(void *self, int16_t x0, int16_t y0, color_t color)
+put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
 {
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 }
@@ -71,10 +71,10 @@ blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
 }
 
 static void
-hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
+hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
-    static color_t line[DISPLAY_WIDTH];
-    color_t *ptr = line;
+    static hagl_color_t line[DISPLAY_WIDTH];
+    hagl_color_t *ptr = line;
     uint16_t height = 1;
 
     for (uint16_t x = 0; x < width; x++) {
@@ -85,10 +85,10 @@ hline(void *self, int16_t x0, int16_t y0, uint16_t width, color_t color)
 }
 
 static void
-vline(void *self, int16_t x0, int16_t y0, uint16_t height, color_t color)
+vline(void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
-    static color_t line[DISPLAY_HEIGHT];
-    color_t *ptr = line;
+    static hagl_color_t line[DISPLAY_HEIGHT];
+    hagl_color_t *ptr = line;
     uint16_t width = 1;
 
     for (uint16_t x = 0; x < height; x++) {
