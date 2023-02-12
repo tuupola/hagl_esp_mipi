@@ -174,16 +174,7 @@ hagl_hal_init(hagl_backend_t *backend)
         memset(buffer2, 0x00, BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH));
     };
 
-    /* Clear both and leave pointer to buffer1. */
-    memset(&bb, 0, sizeof(hagl_bitmap_t));
-    bb.width = DISPLAY_WIDTH;
-    bb.height = DISPLAY_HEIGHT;
-    bb.depth = DISPLAY_DEPTH;
-
-    bitmap_init(&bb, buffer2);
-    bitmap_init(&bb, buffer1);
     backend->buffer = buffer1;
-
     backend->width = MIPI_DISPLAY_WIDTH;
     backend->height = MIPI_DISPLAY_HEIGHT;
     backend->depth = MIPI_DISPLAY_DEPTH;
@@ -193,8 +184,9 @@ hagl_hal_init(hagl_backend_t *backend)
     backend->vline = vline;
     backend->blit = blit;
     backend->scale_blit = scale_blit;
-
     backend->flush = flush;
+
+    hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
 }
 
 
