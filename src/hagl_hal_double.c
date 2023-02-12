@@ -190,13 +190,6 @@ hagl_hal_init(hagl_backend_t *backend)
 
     heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
-    memset(&bb, 0, sizeof(hagl_bitmap_t));
-    bb.width = DISPLAY_WIDTH;
-    bb.height = DISPLAY_HEIGHT;
-    bb.depth = DISPLAY_DEPTH;
-
-    bitmap_init(&bb, backend->buffer);
-
     backend->width = MIPI_DISPLAY_WIDTH;
     backend->height = MIPI_DISPLAY_HEIGHT;
     backend->depth = MIPI_DISPLAY_DEPTH;
@@ -206,8 +199,9 @@ hagl_hal_init(hagl_backend_t *backend)
     backend->vline = vline;
     backend->blit = blit;
     backend->scale_blit = scale_blit;
-
     backend->flush = flush;
+
+    hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
 }
 
 #endif /* CONFIG_HAGL_HAL_USE_DOUBLE_BUFFERING */
