@@ -210,21 +210,21 @@ void mipi_display_init(spi_device_handle_t *spi)
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
 
     mipi_display_spi_master_init(spi);
-    vTaskDelay(100 / portTICK_RATE_MS);
+    vTaskDelay(100 / portTICK_PERIOD_MS);
 
     /* Reset the display. */
     if (CONFIG_MIPI_DISPLAY_PIN_RST > 0) {
         esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_RST);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_RST, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 0);
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 1);
-        vTaskDelay(100 / portTICK_RATE_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 
     /* Send minimal init commands. */
     mipi_display_write_command(*spi, MIPI_DCS_SOFT_RESET);
-    vTaskDelay(200 / portTICK_RATE_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_ADDRESS_MODE);
     mipi_display_write_data(*spi, &(uint8_t){MIPI_DISPLAY_ADDRESS_MODE}, 1);
@@ -239,10 +239,10 @@ void mipi_display_init(spi_device_handle_t *spi)
 #endif
 
     mipi_display_write_command(*spi, MIPI_DCS_EXIT_SLEEP_MODE);
-    vTaskDelay(200 / portTICK_RATE_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_DISPLAY_ON);
-    vTaskDelay(200 / portTICK_RATE_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
 
     /* Enable backlight. */
     if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
