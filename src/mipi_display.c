@@ -201,12 +201,12 @@ void mipi_display_init(spi_device_handle_t *spi)
     mutex = xSemaphoreCreateMutex();
 
     if (CONFIG_MIPI_DISPLAY_PIN_CS > 0) {
-        gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
+        esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
     };
 
-    gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
+    esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
 
     mipi_display_spi_master_init(spi);
@@ -214,7 +214,7 @@ void mipi_display_init(spi_device_handle_t *spi)
 
     /* Reset the display. */
     if (CONFIG_MIPI_DISPLAY_PIN_RST > 0) {
-        gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_RST);
+        esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_RST);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_RST, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 0);
         vTaskDelay(100 / portTICK_RATE_MS);
@@ -246,12 +246,15 @@ void mipi_display_init(spi_device_handle_t *spi)
 
     /* Enable backlight. */
     if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
+        ESP_LOGI(TAG, "Enabling backlight pin %d", CONFIG_MIPI_DISPLAY_PIN_BL);
+        esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_BL);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
         gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 1);
+        //gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 0);
 
         /* Enable backlight PWM. */
         if (CONFIG_MIPI_DISPLAY_PWM_BL > 0) {
-            ESP_LOGI(TAG, "Initializing backlight PWM");
+            ESP_LOGI(TAG, "Setting backlight PWM to %d", CONFIG_MIPI_DISPLAY_PWM_BL);
             ledc_timer_config_t timercfg = {
                 .duty_resolution = LEDC_TIMER_13_BIT,
                 .freq_hz = 9765,
