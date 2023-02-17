@@ -249,8 +249,7 @@ void mipi_display_init(spi_device_handle_t *spi)
         ESP_LOGI(TAG, "Enabling backlight pin %d", CONFIG_MIPI_DISPLAY_PIN_BL);
         esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_BL);
         gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
-        gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 1);
-        //gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, 0);
+        gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, CONFIG_MIPI_DISPLAY_PIN_BL_ACTIVE);
 
         /* Enable backlight PWM. */
         if (CONFIG_MIPI_DISPLAY_PWM_BL > 0) {
