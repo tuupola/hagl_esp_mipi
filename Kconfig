@@ -209,12 +209,20 @@ config MIPI_DISPLAY_PIN_DC
 config MIPI_DISPLAY_PIN_RST
     int "RST pin number"
     default 33
-    help
-        RST pin number. Defaults are ok for M5Stick.
 
 config MIPI_DISPLAY_PIN_BL
     int "Backlight pin number"
     default 32
+
+if MIPI_DISPLAY_PIN_BL != -1
+    config MIPI_DISPLAY_PIN_BL_ACTIVE
+        int "Active state of backlight pin"
+        range 0 1
+        default 1
+        help
+            Use 0 if your board requires pulling the pin down to enable the
+            backlight. For most boards the default value 1 is ok.
+endif
 
 if MIPI_DISPLAY_PIN_BL != -1
     config MIPI_DISPLAY_PWM_BL
