@@ -48,6 +48,7 @@ SPDX-License-Identifier: MIT
 #include <soc/gpio_struct.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
+#include <esp_rom_gpio.h>
 
 #include "sdkconfig.h"
 #include "mipi_dcs.h"
