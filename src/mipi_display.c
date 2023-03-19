@@ -48,6 +48,7 @@ SPDX-License-Identifier: MIT
 #include <soc/gpio_struct.h>
 #include <driver/gpio.h>
 #include <esp_log.h>
+#include <esp_rom_gpio.h>
 
 #include "sdkconfig.h"
 #include "mipi_dcs.h"
@@ -244,39 +245,38 @@ void mipi_display_init(spi_device_handle_t *spi)
     mipi_display_write_command(*spi, MIPI_DCS_SET_DISPLAY_ON);
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
+#if CONFIG_MIPI_DISPLAY_PIN_BL > 0
     /* Enable backlight. */
-    if (CONFIG_MIPI_DISPLAY_PIN_BL > 0) {
-        ESP_LOGI(TAG, "Enabling backlight pin %d", CONFIG_MIPI_DISPLAY_PIN_BL);
-        esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_BL);
-        gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
-        gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, CONFIG_MIPI_DISPLAY_PIN_BL_ACTIVE);
+    ESP_LOGI(TAG, "Enabling backlight pin %d", CONFIG_MIPI_DISPLAY_PIN_BL);
+    esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_BL);
+    gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
+    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, CONFIG_MIPI_DISPLAY_PIN_BL_ACTIVE);
+#endif
 
-        /* Enable backlight PWM. */
-        if (CONFIG_MIPI_DISPLAY_PWM_BL > 0) {
-            ESP_LOGI(TAG, "Setting backlight PWM to %d", CONFIG_MIPI_DISPLAY_PWM_BL);
-            ledc_timer_config_t timercfg = {
-                .duty_resolution = LEDC_TIMER_13_BIT,
-                .freq_hz = 9765,
-                .speed_mode = LEDC_LOW_SPEED_MODE,
-                .timer_num = LEDC_TIMER_0,
-                .clk_cfg = LEDC_AUTO_CLK,
-            };
+#if CONFIG_MIPI_DISPLAY_PWM_BL > 0
+    /* Enable backlight PWM. */
+    ESP_LOGI(TAG, "Setting backlight PWM to %d", CONFIG_MIPI_DISPLAY_PWM_BL);
+    ledc_timer_config_t timercfg = {
+        .duty_resolution = LEDC_TIMER_13_BIT,
+        .freq_hz = 9765,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .timer_num = LEDC_TIMER_0,
+        .clk_cfg = LEDC_AUTO_CLK,
+    };
 
-            ledc_timer_config(&timercfg);
+    ledc_timer_config(&timercfg);
 
-            ledc_channel_config_t channelcfg = {
-                .channel    = LEDC_CHANNEL_0,
-                .duty       = CONFIG_MIPI_DISPLAY_PWM_BL,
-                .gpio_num   = CONFIG_MIPI_DISPLAY_PIN_BL,
-                .speed_mode = LEDC_LOW_SPEED_MODE,
-                .hpoint     = 0,
-                .timer_sel  = LEDC_TIMER_0,
-            };
+    ledc_channel_config_t channelcfg = {
+        .channel    = LEDC_CHANNEL_0,
+        .duty       = CONFIG_MIPI_DISPLAY_PWM_BL,
+        .gpio_num   = CONFIG_MIPI_DISPLAY_PIN_BL,
+        .speed_mode = LEDC_LOW_SPEED_MODE,
+        .hpoint     = 0,
+        .timer_sel  = LEDC_TIMER_0,
+    };
 
-            ledc_channel_config(&channelcfg);
-        }
-
-    }
+    ledc_channel_config(&channelcfg);
+#endif
 
     ESP_LOGI(TAG, "Display initialized.");
 
