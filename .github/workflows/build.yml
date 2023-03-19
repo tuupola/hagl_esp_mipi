@@ -1,0 +1,71 @@
+name: Build test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build with esp-idf
+    runs-on: ubuntu-latest
+    container: espressif/idf:${{ matrix.idf_version }}
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: False
+      matrix:
+        idf_version:
+          - release-v4.4
+          - release-v5.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: testing
+
+      - name: Create esp-idf ${{ matrix.idf_version }} project
+        working-directory: testing
+        shell: bash -e "{0}"
+        run: |
+          mv sdkconfig sdkconfig.bak
+          source /opt/esp/idf/export.sh
+          idf.py create-project project
+          mv sdkconfig.bak sdkconfig
+
+      - name: Checkout hagl component build dependency
+        uses: actions/checkout@v3
+        with:
+          repository: tuupola/hagl
+          path: testing/project/components/hagl
+
+      - name: Build with esp-idf ${{ matrix.idf_version }}
+        working-directory: testing/project
+        shell: bash -e "{0}"
+        run: |
+          set -o pipefail -o errexit
+
+          mkdir -p logs
+          source /opt/esp/idf/export.sh
+          ln -sf ${GITHUB_WORKSPACE}/testing components/hagl_hal
+
+          for cfg in ${GITHUB_WORKSPACE}/testing/sdkconfig/* ; do
+            cp $cfg sdkconfig
+            echo "[*] Building $(basename $cfg)"
+            idf.py build 2>&1 | tee "logs/build-$(basename $cfg).log"
+          done
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.idf_version }}-logs
+          path: "testing/project/logs"
