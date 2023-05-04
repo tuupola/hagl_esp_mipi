@@ -201,11 +201,11 @@ void mipi_display_init(spi_device_handle_t *spi)
 {
     mutex = xSemaphoreCreateMutex();
 
-    if (CONFIG_MIPI_DISPLAY_PIN_CS > 0) {
-        esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
-        gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
-        gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
-    };
+#if CONFIG_MIPI_DISPLAY_PIN_CS > 0
+    esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
+    gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
+    gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
+#endif
 
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
