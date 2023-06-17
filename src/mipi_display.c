@@ -90,7 +90,7 @@ static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
 
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
-    ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_DEBUG);
+    ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_VERBOSE);
 }
 
 static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
