@@ -73,24 +73,29 @@ static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t co
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t length)
 {
     if (0 == length) {
         return;
     };
 
-    spi_transaction_t transaction;
-    memset(&transaction, 0, sizeof(transaction));
-
-     /* Length in bits. */
-    transaction.length = length * 8;
-    transaction.tx_buffer = data;
-
     /* Set DC high to denote data. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
 
-    ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
-    ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_VERBOSE);
+    for (size_t i = 0; i < length; i += SPI_MAX_TRANSFER_SIZE) {
+        size_t chunk = MIN(SPI_MAX_TRANSFER_SIZE, length - i);
+
+        spi_transaction_t transaction = {0};
+        transaction.length = chunk * 8;
+        transaction.tx_buffer = data + i;
+        transaction.rx_buffer = NULL;
+
+        ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
+        //ESP_ERROR_CHECK(spi_device_queue_trans(spi, &transaction, portMAX_DELAY));
+        ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_VERBOSE);
+    }
 }
 
 static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
@@ -182,13 +187,14 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
         .quadwp_io_num = -1,
         .quadhd_io_num = -1,
         /* Max transfer size in bytes. */
-        .max_transfer_sz = SPI_MAX_TRANSFER_SIZE
+        .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
+        .flags = 0
     };
     spi_device_interface_config_t devcfg = {
         .clock_speed_hz = CONFIG_MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ,
         .mode = CONFIG_MIPI_DISPLAY_SPI_MODE,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
-        .queue_size = 64,
+        .queue_size = 8,
         .flags = SPI_DEVICE_NO_DUMMY
     };
 
