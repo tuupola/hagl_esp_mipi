@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2021 Mika Tuupola
+Copyright (c) 2019-2025 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the MIPI DCS HAL for HAGL graphics library:
+This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
 https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
@@ -176,9 +176,9 @@ hagl_hal_init(hagl_backend_t *backend)
     );
 
     backend->buffer = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA
+        );
     if (NULL == backend->buffer) {
         ESP_LOGE(TAG, "NO BUFFER");
     };

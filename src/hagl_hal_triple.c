@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2021 Mika Tuupola
+Copyright (c) 2019-2025 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the MIPI DCS HAL for HAGL graphics library:
+This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
 https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
@@ -142,9 +142,9 @@ hagl_hal_init(hagl_backend_t *backend)
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
     buffer1 = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+        );
     if (NULL == buffer1) {
         ESP_LOGE(TAG, "Failed to alloc buffer 1.");
     } else {
@@ -163,9 +163,9 @@ hagl_hal_init(hagl_backend_t *backend)
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
     buffer2 = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+        );
 
     if (NULL == buffer2) {
         ESP_LOGE(TAG, "Failed to alloc buffer 2.");
@@ -188,7 +188,5 @@ hagl_hal_init(hagl_backend_t *backend)
 
     hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
 }
-
-
 
 #endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */

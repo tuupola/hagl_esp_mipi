@@ -3,7 +3,7 @@
 MIT License
 
 Copyright (c) 2017-2018 Espressif Systems (Shanghai) PTE LTD
-Copyright (c) 2019-2021 Mika Tuupola
+Copyright (c) 2019-2025 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ SOFTWARE.
 This code is based on Espressif provided SPI Master example which was
 released to Public Domain: https://goo.gl/ksC2Ln
 
-This file is part of the MIPI DCS Display Driver:
-https://github.com/tuupola/esp_mipi
+This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
+https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
@@ -57,17 +57,19 @@ SPDX-License-Identifier: MIT
 static const char *TAG = "mipi_display";
 static SemaphoreHandle_t mutex;
 
-static inline int min(int a, int b)
+static inline int
+min(int a, int b)
 {
     return (a > b) ? b : a;
 }
 
-static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
+static void
+mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
 {
     spi_transaction_t transaction;
     memset(&transaction, 0, sizeof(transaction));
 
-     /* Length in bits. */
+    /* Length in bits. */
     transaction.length = 1 * 8;
     transaction.tx_buffer = &command;
 
@@ -78,7 +80,8 @@ static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t co
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
-static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t length)
+static void
+mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t length)
 {
     if (0 == length) {
         return;
@@ -101,7 +104,8 @@ static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data
     }
 }
 
-static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
+static void
+mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
 {
     if (0 == length) {
         return;
@@ -110,7 +114,7 @@ static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_
     spi_transaction_t transaction;
     memset(&transaction, 0, sizeof(transaction));
 
-     /* Length in bits */
+    /* Length in bits */
     transaction.length = length * 8;
     transaction.rxlength = length * 8;
     transaction.rx_buffer = data;
@@ -123,7 +127,9 @@ static void mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_
 }
 
 
-static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+static void
+mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
+{
     uint8_t data[4];
     static uint16_t prev_x1, prev_x2, prev_y1, prev_y2;
 
@@ -161,7 +167,8 @@ static void mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint1
     mipi_display_write_command(spi, MIPI_DCS_WRITE_MEMORY_START);
 }
 
-size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
+size_t
+mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
 {
     if (0 == w || 0 == h) {
         return 0;
@@ -181,7 +188,8 @@ size_t mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uin
     return size;
 }
 
-static void mipi_display_spi_master_init(spi_device_handle_t *spi)
+static void
+mipi_display_spi_master_init(spi_device_handle_t *spi)
 {
     spi_bus_config_t buscfg = {
         .miso_io_num = CONFIG_MIPI_DISPLAY_PIN_MISO,
@@ -208,7 +216,8 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
     ESP_LOGI(TAG, "SPI_MAX_TRANSFER_SIZE: %d", SPI_MAX_TRANSFER_SIZE);
 }
 
-void mipi_display_init(spi_device_handle_t *spi)
+void
+mipi_display_init(spi_device_handle_t *spi)
 {
     mutex = xSemaphoreCreateMutex();
 
@@ -239,10 +248,10 @@ void mipi_display_init(spi_device_handle_t *spi)
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_ADDRESS_MODE);
-    mipi_display_write_data(*spi, &(uint8_t){MIPI_DISPLAY_ADDRESS_MODE}, 1);
+    mipi_display_write_data(*spi, &(uint8_t) {MIPI_DISPLAY_ADDRESS_MODE}, 1);
 
     mipi_display_write_command(*spi, MIPI_DCS_SET_PIXEL_FORMAT);
-    mipi_display_write_data(*spi, &(uint8_t){CONFIG_MIPI_DISPLAY_PIXEL_FORMAT}, 1);
+    mipi_display_write_data(*spi, &(uint8_t) {CONFIG_MIPI_DISPLAY_PIXEL_FORMAT}, 1);
 
 #ifdef CONFIG_MIPI_DISPLAY_INVERT
     mipi_display_write_command(*spi, MIPI_DCS_ENTER_INVERT_MODE);
@@ -294,7 +303,8 @@ void mipi_display_init(spi_device_handle_t *spi)
     spi_device_acquire_bus(*spi, portMAX_DELAY);
 }
 
-void mipi_display_ioctl(spi_device_handle_t spi, const uint8_t command, uint8_t *data, size_t size)
+void
+mipi_display_ioctl(spi_device_handle_t spi, const uint8_t command, uint8_t *data, size_t size)
 {
     xSemaphoreTake(mutex, portMAX_DELAY);
 
@@ -328,7 +338,8 @@ void mipi_display_ioctl(spi_device_handle_t spi, const uint8_t command, uint8_t 
     xSemaphoreGive(mutex);
 }
 
-void mipi_display_close(spi_device_handle_t spi)
+void
+mipi_display_close(spi_device_handle_t spi)
 {
     spi_device_release_bus(spi);
 }
