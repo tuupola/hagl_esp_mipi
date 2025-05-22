@@ -57,6 +57,11 @@ SPDX-License-Identifier: MIT
 static const char *TAG = "mipi_display";
 static SemaphoreHandle_t mutex;
 
+static inline int min(int a, int b)
+{
+    return (a > b) ? b : a;
+}
+
 static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
 {
     spi_transaction_t transaction;
@@ -73,8 +78,6 @@ static void mipi_display_write_command(spi_device_handle_t spi, const uint8_t co
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
 static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t length)
 {
     if (0 == length) {
@@ -85,7 +88,7 @@ static void mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
 
     for (size_t i = 0; i < length; i += SPI_MAX_TRANSFER_SIZE) {
-        size_t chunk = MIN(SPI_MAX_TRANSFER_SIZE, length - i);
+        size_t chunk = min(SPI_MAX_TRANSFER_SIZE, length - i);
 
         spi_transaction_t transaction = {0};
         transaction.length = chunk * 8;
