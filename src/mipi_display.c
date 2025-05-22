@@ -204,6 +204,8 @@ static void mipi_display_spi_master_init(spi_device_handle_t *spi)
     /* ESP32S2 requires DMA channel to match the SPI host. */
     ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_MIPI_DISPLAY_SPI_HOST, &buscfg, SPI_DMA_CH_AUTO));
     ESP_ERROR_CHECK(spi_bus_add_device(CONFIG_MIPI_DISPLAY_SPI_HOST, &devcfg, spi));
+
+    ESP_LOGI(TAG, "SPI_MAX_TRANSFER_SIZE: %d", SPI_MAX_TRANSFER_SIZE);
 }
 
 void mipi_display_init(spi_device_handle_t *spi)
