@@ -176,9 +176,9 @@ hagl_hal_init(hagl_backend_t *backend)
     );
 
     backend->buffer = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA
+        );
     if (NULL == backend->buffer) {
         ESP_LOGE(TAG, "NO BUFFER");
     };

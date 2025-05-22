@@ -142,9 +142,9 @@ hagl_hal_init(hagl_backend_t *backend)
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
     buffer1 = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+        );
     if (NULL == buffer1) {
         ESP_LOGE(TAG, "Failed to alloc buffer 1.");
     } else {
@@ -163,9 +163,9 @@ hagl_hal_init(hagl_backend_t *backend)
     // heap_caps_print_heap_info(MALLOC_CAP_DMA | MALLOC_CAP_32BIT);
 
     buffer2 = (uint8_t *) heap_caps_malloc(
-        BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
-        MALLOC_CAP_DMA | MALLOC_CAP_32BIT
-    );
+            BITMAP_SIZE(DISPLAY_WIDTH, DISPLAY_HEIGHT, DISPLAY_DEPTH),
+            MALLOC_CAP_DMA | MALLOC_CAP_32BIT
+        );
 
     if (NULL == buffer2) {
         ESP_LOGE(TAG, "Failed to alloc buffer 2.");
