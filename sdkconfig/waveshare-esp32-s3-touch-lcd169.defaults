@@ -1,6 +1,7 @@
 # This file contains tested settings for Waveshare ESP32-S3-Touch-LCD-1.69 (240x280 ST7789V2)
 #
 # https://www.waveshare.com/wiki/ESP32-S3-Touch-LCD-1.69
+# https://archive.is/KVD5s
 #
 # To use it copy the contents to your project root before running menuconfig.
 #
