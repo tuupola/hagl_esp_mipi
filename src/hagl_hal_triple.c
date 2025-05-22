@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2021 Mika Tuupola
+Copyright (c) 2019-2025 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the MIPI DCS HAL for HAGL graphics library:
+This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
 https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
@@ -188,7 +188,5 @@ hagl_hal_init(hagl_backend_t *backend)
 
     hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
 }
-
-
 
 #endif /* #ifdef CONFIG_HAGL_HAL_USE_TRIPLE_BUFFERING */

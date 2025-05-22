@@ -3,7 +3,7 @@
 MIT License
 
 Copyright (c) 2017-2018 Espressif Systems (Shanghai) PTE LTD
-Copyright (c) 2019-2021 Mika Tuupola
+Copyright (c) 2019-2025 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ SOFTWARE.
 This code is based on Espressif provided SPI Master example which was
 released to Public Domain: https://goo.gl/ksC2Ln
 
-This file is part of the MIPI DCS Display Driver:
-https://github.com/tuupola/esp_mipi
+This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
+https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
