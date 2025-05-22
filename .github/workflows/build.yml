@@ -24,7 +24,7 @@ jobs:
       matrix:
         idf_version:
           - release-v4.4
-          - release-v5.0
+          - release-v5.4
 
     steps:
       - name: Checkout
