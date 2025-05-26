@@ -186,6 +186,20 @@ config MIPI_DISPLAY_SPI_HOST
     default 0x02 if ESP32S3_SPI3_SELECTED
 endif
 
+if IDF_TARGET_ESP32C6
+choice
+    prompt "SPI HOST"
+    default ESP32C6_SPI2_SELECTED
+
+    config ESP32C6_SPI2_SELECTED
+        bool "SPI2"
+endchoice
+
+config MIPI_DISPLAY_SPI_HOST
+    hex
+    default 0x01 if ESP32C6_SPI2_SELECTED
+endif
+
 config MIPI_DISPLAY_PIN_MISO
     int "MISO pin number"
     default -1
