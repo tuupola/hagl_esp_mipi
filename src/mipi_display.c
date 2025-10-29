@@ -164,7 +164,7 @@ mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint
 }
 
 size_t
-mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
+mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, const uint8_t *buffer)
 {
     if (0 == w || 0 == h) {
         return 0;
