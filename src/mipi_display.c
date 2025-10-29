@@ -99,7 +99,7 @@ mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t len
 
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
         //ESP_ERROR_CHECK(spi_device_queue_trans(spi, &transaction, portMAX_DELAY));
-        ESP_LOG_BUFFER_HEX_LEVEL(TAG, data, length, ESP_LOG_VERBOSE);
+        ESP_LOG_BUFFER_HEX_LEVEL(TAG, data + i, chunk, ESP_LOG_VERBOSE);
     }
 }
 
