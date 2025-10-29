@@ -170,8 +170,8 @@ mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w
         return 0;
     }
 
-    const int32_t x2 = x1 + w - 1;
-    const int32_t y2 = y1 + h - 1;
+    const uint16_t x2 = x1 + w - 1;
+    const uint16_t y2 = y1 + h - 1;
     const size_t size = w * h * DISPLAY_DEPTH / 8;
 
     xSemaphoreTake(mutex, portMAX_DELAY);
