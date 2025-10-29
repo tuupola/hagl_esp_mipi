@@ -111,21 +111,17 @@ mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
         return;
     };
 
-    spi_transaction_t transaction;
-    memset(&transaction, 0, sizeof(transaction));
-
-    /* Length in bits */
-    transaction.length = length * 8;
-    transaction.rxlength = length * 8;
-    transaction.rx_buffer = data;
-    //transaction.flags = SPI_TRANS_USE_RXDATA;
+    spi_transaction_t transaction = {
+        .length = 0, /* no tx */
+        .rxlength = length * 8,/* length in bits */
+        .rx_buffer = data,
+    };
 
     /* Set DC high to denote data. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
 
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
-
 
 static void
 mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
