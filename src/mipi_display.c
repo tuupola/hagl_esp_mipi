@@ -113,7 +113,7 @@ mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
 
     spi_transaction_t transaction = {
         .length = 0, /* no tx */
-        .rxlength = length * 8,/* lenght in bits */
+        .rxlength = length * 8,/* length in bits */
         .rx_buffer = data,
     };
 
