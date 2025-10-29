@@ -92,10 +92,11 @@ mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t len
     for (size_t i = 0; i < length; i += SPI_MAX_TRANSFER_SIZE) {
         size_t chunk = min(SPI_MAX_TRANSFER_SIZE, length - i);
 
-        spi_transaction_t transaction = {0};
-        transaction.length = chunk * 8;
-        transaction.tx_buffer = data + i;
-        transaction.rx_buffer = NULL;
+        spi_transaction_t transaction = {
+            .length = chunk * 8,
+            .tx_buffer = data + i,
+            .rx_buffer = NULL
+        };
 
         ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
         //ESP_ERROR_CHECK(spi_device_queue_trans(spi, &transaction, portMAX_DELAY));
