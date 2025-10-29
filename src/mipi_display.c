@@ -66,14 +66,13 @@ min(int a, int b)
 static void
 mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
 {
-    spi_transaction_t transaction;
-    memset(&transaction, 0, sizeof(transaction));
+    spi_transaction_t transaction = {
+        .length = 8,
+        .flags = SPI_TRANS_USE_TXDATA,
+        .tx_data = {command},
+    };
 
-    /* Length in bits. */
-    transaction.length = 1 * 8;
-    transaction.tx_buffer = &command;
-
-    ESP_LOGD(TAG, "Sending command 0x%02x", (uint8_t)command);
+    ESP_LOGD(TAG, "Sending command 0x%02x", command);
 
     /* Set DC low to denote a command. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 0);
