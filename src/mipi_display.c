@@ -164,14 +164,14 @@ mipi_display_set_address(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint
 }
 
 size_t
-mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer)
+mipi_display_write(spi_device_handle_t spi, uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, const uint8_t *buffer)
 {
     if (0 == w || 0 == h) {
         return 0;
     }
 
-    const int32_t x2 = x1 + w - 1;
-    const int32_t y2 = y1 + h - 1;
+    const uint16_t x2 = x1 + w - 1;
+    const uint16_t y2 = y1 + h - 1;
     const size_t size = w * h * DISPLAY_DEPTH / 8;
 
     xSemaphoreTake(mutex, portMAX_DELAY);
