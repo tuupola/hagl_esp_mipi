@@ -200,6 +200,12 @@ config MIPI_DISPLAY_SPI_HOST
     default 0x01 if ESP32C6_SPI2_SELECTED
 endif
 
+config MIPI_DISPLAY_USE_QSPI
+    bool "Use QSPI (Quad SPI) mode"
+    default n
+    help
+        Enable QSPI mode.
+
 config MIPI_DISPLAY_PIN_MISO
     int "MISO pin number"
     default -1
@@ -207,6 +213,14 @@ config MIPI_DISPLAY_PIN_MISO
 config MIPI_DISPLAY_PIN_MOSI
     int "MOSI pin number"
     default 23
+
+config MIPI_DISPLAY_PIN_D2
+    int "D2 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
+    default -1
+
+config MIPI_DISPLAY_PIN_D3
+    int "D3 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
+    default -1
 
 config MIPI_DISPLAY_PIN_CLK
     int "CLK pin number"
