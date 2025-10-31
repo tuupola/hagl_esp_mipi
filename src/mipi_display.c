@@ -222,7 +222,7 @@ mipi_display_init(spi_device_handle_t *spi)
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
-#endif
+#endif /* CONFIG_MIPI_DISPLAY_PIN_CS > 0 */
 
     /* Setup DC pin */
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
@@ -239,7 +239,7 @@ mipi_display_init(spi_device_handle_t *spi)
     vTaskDelay(100 / portTICK_PERIOD_MS);
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 1);
     vTaskDelay(100 / portTICK_PERIOD_MS);
-#endif
+#endif /* CONFIG_MIPI_DISPLAY_PIN_RST > 0 */
 
     /* Send minimal init commands. */
     mipi_display_write_command(*spi, MIPI_DCS_SOFT_RESET);
@@ -255,7 +255,7 @@ mipi_display_init(spi_device_handle_t *spi)
     mipi_display_write_command(*spi, MIPI_DCS_ENTER_INVERT_MODE);
 #else
     mipi_display_write_command(*spi, MIPI_DCS_EXIT_INVERT_MODE);
-#endif
+#endif /* CONFIG_MIPI_DISPLAY_INVERT */
 
     mipi_display_write_command(*spi, MIPI_DCS_EXIT_SLEEP_MODE);
     vTaskDelay(200 / portTICK_PERIOD_MS);
@@ -269,7 +269,7 @@ mipi_display_init(spi_device_handle_t *spi)
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_BL);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_BL, GPIO_MODE_OUTPUT);
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_BL, CONFIG_MIPI_DISPLAY_PIN_BL_ACTIVE);
-#endif
+#endif /* CONFIG_MIPI_DISPLAY_PIN_BL > 0 */
 
 #if CONFIG_MIPI_DISPLAY_PWM_BL > 0
     /* Enable backlight PWM. */
@@ -294,7 +294,7 @@ mipi_display_init(spi_device_handle_t *spi)
     };
 
     ledc_channel_config(&channelcfg);
-#endif
+#endif /*  CONFIG_MIPI_DISPLAY_PWM_BL > 0 */
 
     ESP_LOGI(TAG, "Display initialized.");
 
