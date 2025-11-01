@@ -207,12 +207,20 @@ config MIPI_DISPLAY_USE_QSPI
         Enable QSPI mode.
 
 config MIPI_DISPLAY_PIN_MISO
-    int "MISO pin number"
+    int "MISO pin number" if !MIPI_DISPLAY_USE_QSPI
     default -1
 
 config MIPI_DISPLAY_PIN_MOSI
-    int "MOSI pin number"
-    default 23
+    int "MOSI pin number" if !MIPI_DISPLAY_USE_QSPI
+    default -1
+
+config MIPI_DISPLAY_PIN_D0
+    int "D0 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
+    default -1
+
+config MIPI_DISPLAY_PIN_D1
+    int "D1 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
+    default -1
 
 config MIPI_DISPLAY_PIN_D2
     int "D2 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
@@ -221,6 +229,7 @@ config MIPI_DISPLAY_PIN_D2
 config MIPI_DISPLAY_PIN_D3
     int "D3 pin (for QSPI)" if MIPI_DISPLAY_USE_QSPI
     default -1
+
 
 config MIPI_DISPLAY_PIN_CLK
     int "CLK pin number"

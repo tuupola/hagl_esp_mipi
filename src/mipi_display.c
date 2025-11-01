@@ -66,16 +66,25 @@ min(int a, int b)
 static void
 mipi_display_write_command(spi_device_handle_t spi, const uint8_t command)
 {
+    // spi_transaction_t transaction = {
+    //     .length = 8,
+    //     .flags = SPI_TRANS_USE_TXDATA,
+    //     .tx_data = {command},
+    // };
+
     spi_transaction_t transaction = {
-        .length = 8,
-        .flags = SPI_TRANS_USE_TXDATA,
-        .tx_data = {command},
+        .cmd = command,           // Command in command phase
+        .length = 0,              // No data
+        .flags = 0,
     };
 
     ESP_LOGD(TAG, "Sending command 0x%02x", command);
 
+#if CONFIG_MIPI_DISPLAY_PIN_DC > 0
     /* Set DC low to denote a command. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 0);
+#endif
+
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
 
@@ -86,8 +95,10 @@ mipi_display_write_data(spi_device_handle_t spi, const uint8_t *data, size_t len
         return;
     };
 
+#if CONFIG_MIPI_DISPLAY_PIN_DC > 0
     /* Set DC high to denote data. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
+#endif
 
     for (size_t i = 0; i < length; i += SPI_MAX_TRANSFER_SIZE) {
         size_t chunk = min(SPI_MAX_TRANSFER_SIZE, length - i);
@@ -117,8 +128,10 @@ mipi_display_read_data(spi_device_handle_t spi, uint8_t *data, size_t length)
         .rx_buffer = data,
     };
 
+#if CONFIG_MIPI_DISPLAY_PIN_DC > 0
     /* Set DC high to denote data. */
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_DC, 1);
+#endif
 
     ESP_ERROR_CHECK(spi_device_polling_transmit(spi, &transaction));
 }
@@ -188,21 +201,30 @@ static void
 mipi_display_spi_master_init(spi_device_handle_t *spi)
 {
     spi_bus_config_t buscfg = {
-        .miso_io_num = CONFIG_MIPI_DISPLAY_PIN_MISO,
-        .mosi_io_num = CONFIG_MIPI_DISPLAY_PIN_MOSI,
+        // .miso_io_num = CONFIG_MIPI_DISPLAY_PIN_MISO,
+        // .mosi_io_num = CONFIG_MIPI_DISPLAY_PIN_MOSI,
         .sclk_io_num = CONFIG_MIPI_DISPLAY_PIN_CLK,
-        .quadwp_io_num = -1,
-        .quadhd_io_num = -1,
+        // .quadwp_io_num = CONFIG_MIPI_DISPLAY_PIN_D2,
+        // .quadhd_io_num = CONFIG_MIPI_DISPLAY_PIN_D3,
+        .data0_io_num = CONFIG_MIPI_DISPLAY_PIN_D0,
+        .data1_io_num = CONFIG_MIPI_DISPLAY_PIN_D1,
+        .data2_io_num = CONFIG_MIPI_DISPLAY_PIN_D2,
+        .data3_io_num = CONFIG_MIPI_DISPLAY_PIN_D3,
         /* Max transfer size in bytes. */
         .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
-        .flags = 0
+        .flags = SPICOMMON_BUSFLAG_MASTER | SPICOMMON_BUSFLAG_GPIO_PINS | SPICOMMON_BUSFLAG_QUAD,
     };
+
     spi_device_interface_config_t devcfg = {
         .clock_speed_hz = CONFIG_MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ,
         .mode = CONFIG_MIPI_DISPLAY_SPI_MODE,
         .spics_io_num = CONFIG_MIPI_DISPLAY_PIN_CS,
         .queue_size = 8,
-        .flags = SPI_DEVICE_NO_DUMMY
+        //.flags = SPI_DEVICE_NO_DUMMY
+        // QSPI!
+        .flags = SPI_DEVICE_HALFDUPLEX,
+        .command_bits = 32,
+        .address_bits = 8,
     };
 
     /* ESP32S2 requires DMA channel to match the SPI host. */
@@ -219,20 +241,25 @@ mipi_display_init(spi_device_handle_t *spi)
 
 #if CONFIG_MIPI_DISPLAY_PIN_CS > 0
     /* Setup CS pin */
+    ESP_LOGI(TAG, "Enabling CS pin %d", CONFIG_MIPI_DISPLAY_PIN_CS);
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_CS);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_CS, GPIO_MODE_OUTPUT);
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_CS, 0);
 #endif /* CONFIG_MIPI_DISPLAY_PIN_CS > 0 */
 
+#if CONFIG_MIPI_DISPLAY_PIN_DC > 0
     /* Setup DC pin */
+    ESP_LOGI(TAG, "Enabling DC pin %d", CONFIG_MIPI_DISPLAY_PIN_DC);
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_DC);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_DC, GPIO_MODE_OUTPUT);
+#endif /* CONFIG_MIPI_DISPLAY_PIN_DC > 0 */
 
     mipi_display_spi_master_init(spi);
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
 #if CONFIG_MIPI_DISPLAY_PIN_RST > 0
     /* Reset the display. */
+    ESP_LOGI(TAG, "Enabling RST pin %d", CONFIG_MIPI_DISPLAY_PIN_RST);
     esp_rom_gpio_pad_select_gpio(CONFIG_MIPI_DISPLAY_PIN_RST);
     gpio_set_direction(CONFIG_MIPI_DISPLAY_PIN_RST, GPIO_MODE_OUTPUT);
     gpio_set_level(CONFIG_MIPI_DISPLAY_PIN_RST, 0);
