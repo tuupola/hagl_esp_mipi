@@ -16,6 +16,7 @@ jobs:
     name: Build with esp-idf
     runs-on: ubuntu-latest
     container: espressif/idf:${{ matrix.idf_version }}
+
     permissions:
       contents: read
 
@@ -26,11 +27,24 @@ jobs:
           - release-v5.5
           - release-v6.0
 
+    env:
+      CCACHE_DIR: /github/home/.ccache
+      IDF_CCACHE_ENABLE: 1
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           path: testing
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: /github/home/.ccache
+          key: ccache-${{ matrix.idf_version }}-${{ runner.os }}-${{ hashFiles('**/sdkconfig') }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ matrix.idf_version }}-${{ runner.os }}-${{ hashFiles('**/sdkconfig') }}-
+            ccache-${{ matrix.idf_version }}-${{ runner.os }}-
 
       - name: Create esp-idf ${{ matrix.idf_version }} project
         working-directory: testing
@@ -52,9 +66,9 @@ jobs:
         shell: bash -e "{0}"
         run: |
           set -o pipefail -o errexit
-
-          mkdir -p logs
+          mkdir -p logs "${CCACHE_DIR}"
           source /opt/esp/idf/export.sh
+          ccache -z   # zero stats so this run's numbers are clean
           ln -sf ${GITHUB_WORKSPACE}/testing components/hagl_hal
 
           for cfg in ${GITHUB_WORKSPACE}/testing/sdkconfig/* ; do
@@ -62,6 +76,8 @@ jobs:
             echo "[*] Building $(basename $cfg)"
             idf.py build 2>&1 | tee "logs/build-$(basename $cfg).log"
           done
+
+          ccache -s
 
       - name: Upload logs
         if: failure()
