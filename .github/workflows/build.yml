@@ -47,18 +47,6 @@ jobs:
           repository: tuupola/hagl
           path: testing/project/components/hagl
 
-      - name: Install ccache
-        run: apt-get update && apt-get install -y ccache
-
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: ~/.ccache
-          key: ccache-${{ matrix.idf_version }}-${{ github.ref }}
-          restore-keys: |
-            ccache-${{ matrix.idf_version }}-
-            ccache-
-
       - name: Build with esp-idf ${{ matrix.idf_version }}
         working-directory: testing/project
         shell: bash -e "{0}"
@@ -66,8 +54,6 @@ jobs:
           set -o pipefail -o errexit
 
           mkdir -p logs
-          export CCACHE_DIR=~/.ccache
-          export CCACHE_MAXSIZE=500M
           source /opt/esp/idf/export.sh
           ln -sf ${GITHUB_WORKSPACE}/testing components/hagl_hal
 
