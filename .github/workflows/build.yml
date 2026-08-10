@@ -23,7 +23,7 @@ jobs:
       fail-fast: False
       matrix:
         idf_version:
-          - release-v5.4
+          - release-v5.5
           - release-v6.0
 
     steps:
