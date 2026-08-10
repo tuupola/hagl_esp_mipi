@@ -16,6 +16,7 @@ jobs:
     name: Build with esp-idf
     runs-on: ubuntu-latest
     container: espressif/idf:${{ matrix.idf_version }}
+
     permissions:
       contents: read
 
@@ -31,6 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: testing
+
       - name: Cache ccache
         uses: actions/cache@v4
         with:
@@ -39,6 +41,7 @@ jobs:
           restore-keys: |
             ccache-${{ runner.os }}-${{ hashFiles('**/sdkconfig') }}-
             ccache-${{ runner.os }}-
+
       - name: Create esp-idf ${{ matrix.idf_version }} project
         working-directory: testing
         shell: bash -e "{0}"
