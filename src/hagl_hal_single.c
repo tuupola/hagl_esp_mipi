@@ -59,19 +59,21 @@ static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
 static void
-put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
+put_pixel(const void *self, int16_t x0, int16_t y0, hagl_color_t color)
 {
     mipi_display_write(spi, x0, y0, 1, 1, (uint8_t *) &color);
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
+blit_xy(const void *self, int16_t x0, int16_t y0, const void *src)
 {
-    mipi_display_write(spi, x0, y0, src->width, src->height, (uint8_t *) src->buffer);
+    const hagl_bitmap_t *bitmap = src;
+
+    mipi_display_write(spi, x0, y0, bitmap->width, bitmap->height, (uint8_t *) bitmap->buffer);
 }
 
 static void
-hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+line_xyw(const void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
     static hagl_color_t line[DISPLAY_WIDTH];
     hagl_color_t *ptr = line;
@@ -85,7 +87,7 @@ hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 }
 
 static void
-vline(void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
+line_xyh(const void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
     static hagl_color_t line[DISPLAY_HEIGHT];
     hagl_color_t *ptr = line;
@@ -108,9 +110,9 @@ hagl_hal_init(hagl_backend_t *backend)
     backend->depth = MIPI_DISPLAY_DEPTH;
     backend->put_pixel = put_pixel;
     // backend->get_pixel = get_pixel;
-    backend->hline = hline;
-    backend->vline = vline;
-    backend->blit = blit;
+    backend->line_xyw = line_xyw;
+    backend->line_xyh = line_xyh;
+    backend->blit_xy = blit_xy;
 }
 
 #endif /* CONFIG_HAGL_HAL_NO_BUFFERING */

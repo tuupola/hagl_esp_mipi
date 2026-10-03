@@ -65,7 +65,7 @@ static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
 static size_t
-flush(void *self)
+flush(const void *self)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     size_t size = 0;
@@ -81,7 +81,7 @@ flush(void *self)
 }
 
 static void
-put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
+put_pixel(const void *self, int16_t x0, int16_t y0, hagl_color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
@@ -93,54 +93,54 @@ put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
 }
 
 static hagl_color_t
-get_pixel(void *self, int16_t x0, int16_t y0)
+get_pixel(const void *self, int16_t x0, int16_t y0)
 {
     return bb.get_pixel(&bb, x0, y0);
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
+blit_xy(const void *self, int16_t x0, int16_t y0, const void *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bb.blit(&bb, x0, y0, src);
+    bb.blit_xy(&bb, x0, y0, src);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
 static void
-scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t *src)
+blit_xywh(const void *self, int16_t x0, int16_t y0, uint16_t w, uint16_t h, const void *src)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bb.scale_blit(&bb, x0, y0, w, h, src);
+    bb.blit_xywh(&bb, x0, y0, w, h, src);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
 static void
-hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+line_xyw(const void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bb.hline(&bb, x0, y0, width, color);
+    bb.line_xyw(&bb, x0, y0, width, color);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
 }
 
 static void
-vline(void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
+line_xyh(const void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreTake(mutex, portMAX_DELAY);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
-    bb.vline(&bb, x0, y0, height, color);
+    bb.line_xyh(&bb, x0, y0, height, color);
 #ifdef CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING
     xSemaphoreGive(mutex);
 #endif /* CONFIG_HAGL_HAL_LOCK_WHEN_FLUSHING */
@@ -195,10 +195,10 @@ hagl_hal_init(hagl_backend_t *backend)
     backend->depth = MIPI_DISPLAY_DEPTH;
     backend->put_pixel = put_pixel;
     backend->get_pixel = get_pixel;
-    backend->hline = hline;
-    backend->vline = vline;
-    backend->blit = blit;
-    backend->scale_blit = scale_blit;
+    backend->line_xyw = line_xyw;
+    backend->line_xyh = line_xyh;
+    backend->blit_xy = blit_xy;
+    backend->blit_xywh = blit_xywh;
     backend->flush = flush;
 
     hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
