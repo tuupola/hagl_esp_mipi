@@ -45,6 +45,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: tuupola/hagl
+          ref: hagl-090
           path: testing/project/components/hagl
 
       - name: Build with esp-idf ${{ matrix.idf_version }}
