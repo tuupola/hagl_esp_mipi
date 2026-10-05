@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2025 Mika Tuupola
+Copyright (c) 2019-2026 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,8 +38,8 @@ SPDX-License-Identifier: MIT
 extern "C" {
 #endif
 
-#include <stdint.h>
 #include <hagl/backend.h>
+#include <stdint.h>
 
 #include "sdkconfig.h"
 
@@ -55,12 +55,12 @@ extern "C" {
 #undef HAGL_HAS_HAL_BACK_BUFFER
 #endif
 
-#define DISPLAY_WIDTH       (CONFIG_MIPI_DISPLAY_WIDTH)
-#define DISPLAY_HEIGHT      (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define DISPLAY_DEPTH       (CONFIG_MIPI_DISPLAY_DEPTH)
-#define MIPI_DISPLAY_WIDTH  (CONFIG_MIPI_DISPLAY_WIDTH)
+#define DISPLAY_WIDTH (CONFIG_MIPI_DISPLAY_WIDTH)
+#define DISPLAY_HEIGHT (CONFIG_MIPI_DISPLAY_HEIGHT)
+#define DISPLAY_DEPTH (CONFIG_MIPI_DISPLAY_DEPTH)
+#define MIPI_DISPLAY_WIDTH (CONFIG_MIPI_DISPLAY_WIDTH)
 #define MIPI_DISPLAY_HEIGHT (CONFIG_MIPI_DISPLAY_HEIGHT)
-#define MIPI_DISPLAY_DEPTH  (CONFIG_MIPI_DISPLAY_DEPTH)
+#define MIPI_DISPLAY_DEPTH (CONFIG_MIPI_DISPLAY_DEPTH)
 
 /**
  * Initialize the HAL
