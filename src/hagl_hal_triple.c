@@ -67,12 +67,15 @@ static const char *TAG = "hagl_esp_mipi";
 static size_t
 flush(const void *self)
 {
+    const hagl_backend_t *backend = self;
     uint8_t *buffer = bb.buffer;
-    if (bb.buffer == buffer1) {
-        bb.buffer = buffer2;
+
+    if (bb.buffer == backend->buffer) {
+        bb.buffer = backend->buffer2;
     } else {
-        bb.buffer = buffer1;
+        bb.buffer = backend->buffer;
     }
+
     return mipi_display_write(spi, 0, 0, bb.width, bb.height, (uint8_t *) buffer);
 }
 
@@ -174,6 +177,7 @@ hagl_hal_init(hagl_backend_t *backend)
     };
 
     backend->buffer = buffer1;
+    backend->buffer2 = buffer2;
     backend->width = MIPI_DISPLAY_WIDTH;
     backend->height = MIPI_DISPLAY_HEIGHT;
     backend->depth = MIPI_DISPLAY_DEPTH;
