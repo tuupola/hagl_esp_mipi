@@ -25,14 +25,14 @@ SOFTWARE.
 -cut-
 
 This file is part of the ESP32 MIPI DCS HAL for HAGL graphics library:
-graphics library: https://github.com/tuupola/hagl_pico_mipi
+https://github.com/tuupola/hagl_esp_mipi/
 
 SPDX-License-Identifier: MIT
 
 */
 
-#ifndef _HAGL_PICO_HAL_COLOR_H
-#define _HAGL_PICO_HAL_COLOR_H
+#ifndef _HAGL_HAL_COLOR_H
+#define _HAGL_HAL_COLOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,9 +40,34 @@ extern "C" {
 
 #include <stdint.h>
 
+#include "sdkconfig.h"
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_24BIT_SELECTED
+typedef uint32_t hagl_color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_18BIT_SELECTED
+typedef uint32_t hagl_color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_16BIT_SELECTED
+/* Currently only this, ie. RGB565 is properly tested. */
 typedef uint16_t hagl_color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_12BIT_SELECTED
+typedef uint16_t hagl_color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_8BIT_SELECTED
+typedef uint8_t hagl_color_t;
+#endif
+
+#ifdef CONFIG_MIPI_DCS_PIXEL_FORMAT_3BIT_SELECTED
+typedef uint8_t hagl_color_t;
+#endif
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _HAGL_PICO_HAL_COLOR_H */
+#endif /* _HAGL_HAL_COLOR_H */
