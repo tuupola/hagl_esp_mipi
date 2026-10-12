@@ -65,52 +65,54 @@ static spi_device_handle_t spi;
 static const char *TAG = "hagl_esp_mipi";
 
 static size_t
-flush(void *self)
+flush(const void *self)
 {
+    const hagl_backend_t *backend = self;
     uint8_t *buffer = bb.buffer;
-    if (bb.buffer == buffer1) {
-        bb.buffer = buffer2;
+
+    if (bb.buffer == backend->buffer) {
+        bb.buffer = backend->buffer2;
     } else {
-        bb.buffer = buffer1;
+        bb.buffer = backend->buffer;
     }
+
     return mipi_display_write(spi, 0, 0, bb.width, bb.height, (uint8_t *) buffer);
 }
 
 static void
-put_pixel(void *self, int16_t x0, int16_t y0, hagl_color_t color)
+put_pixel(const void *self, int16_t x0, int16_t y0, hagl_color_t color)
 {
     bb.put_pixel(&bb, x0, y0, color);
 }
 
 static hagl_color_t
-get_pixel(void *self, int16_t x0, int16_t y0)
+get_pixel(const void *self, int16_t x0, int16_t y0)
 {
     return bb.get_pixel(&bb, x0, y0);
 }
 
 static void
-blit(void *self, int16_t x0, int16_t y0, hagl_bitmap_t *src)
+blit_xy(const void *self, int16_t x0, int16_t y0, const void *src)
 {
-    bb.blit(&bb, x0, y0, src);
+    bb.blit_xy(&bb, x0, y0, src);
 }
 
 static void
-scale_blit(void *self, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t *src)
+blit_xywh(const void *self, int16_t x0, int16_t y0, uint16_t w, uint16_t h, const void *src)
 {
-    bb.scale_blit(&bb, x0, y0, w, h, src);
+    bb.blit_xywh(&bb, x0, y0, w, h, src);
 }
 
 static void
-hline(void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+line_xyw(const void *self, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
-    bb.hline(&bb, x0, y0, width, color);
+    bb.line_xyw(&bb, x0, y0, width, color);
 }
 
-
 static void
-vline(void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
+line_xyh(const void *self, int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
-    bb.vline(&bb, x0, y0, height, color);
+    bb.line_xyh(&bb, x0, y0, height, color);
 }
 
 // void hagl_hal_clear_screen()
@@ -175,15 +177,16 @@ hagl_hal_init(hagl_backend_t *backend)
     };
 
     backend->buffer = buffer1;
+    backend->buffer2 = buffer2;
     backend->width = MIPI_DISPLAY_WIDTH;
     backend->height = MIPI_DISPLAY_HEIGHT;
     backend->depth = MIPI_DISPLAY_DEPTH;
     backend->put_pixel = put_pixel;
     backend->get_pixel = get_pixel;
-    backend->hline = hline;
-    backend->vline = vline;
-    backend->blit = blit;
-    backend->scale_blit = scale_blit;
+    backend->line_xyw = line_xyw;
+    backend->line_xyh = line_xyh;
+    backend->blit_xy = blit_xy;
+    backend->blit_xywh = blit_xywh;
     backend->flush = flush;
 
     hagl_bitmap_init(&bb, backend->width, backend->height, backend->depth, backend->buffer);
